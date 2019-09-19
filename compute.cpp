@@ -17,7 +17,7 @@ Compute::Compute(int segment){
 
 void  Compute::initRtObj(){
     rtObj = new LookuptableModelClass(); 
-    // rtObj->initialize();
+    rtObj->initialize();
 }
 
 // adaptive dt algorithm（可选）
@@ -39,7 +39,7 @@ double Compute::getTime(double lastTime,int layer){
 //Qt(还没完成)
 double Compute:: getQt(double I,double Tnex){
     double Beta = I/37;
-    rtObj->initialize();
+    // rtObj->initialize();
     rtObj->rtU.Tnex = Tnex;
     rtObj->rtU.Beta = Beta;
     rtObj->step();
@@ -49,7 +49,7 @@ double Compute:: getQt(double I,double Tnex){
 
 //R0
 double Compute::getR(double T,double I,double SOC,int layer){
-    rtObj->initialize();
+    // rtObj->initialize();
     rtObj->rtU.T = T;
     rtObj->rtU.SOC = SOC;
     rtObj->step();
