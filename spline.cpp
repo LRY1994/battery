@@ -14,7 +14,6 @@ vector<double> Spline::interpolation(vector<Point> pointList,int option)
         }
         for (int i = 0; i<n; i++){
             h[i] = x[i + 1] - x[i];
-            cout<<h[i]<<endl;
         }
 
         int op;
