@@ -2,7 +2,7 @@
 #define COMPUTE
 
 #include <vector>
-#include "Lookuptable.h"
+#include "./simulink/Lookuptable.h"
 using namespace std;
 
 class Compute

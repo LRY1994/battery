@@ -1,6 +1,7 @@
+#include <cstdio>
 #include "exec.h"
 #include "compute.h"
-#include <cstdio>
+
 using namespace std;
 
 int main (){
@@ -24,4 +25,4 @@ int main (){
    return 0;
  
 };
-// g++  main.cpp exec.cpp tree.cpp compute.cpp spline.cpp Lookuptable.cpp Lookuptable_data.cpp
+// g++  main.cpp exec.cpp tree.cpp compute.cpp spline.cpp simulink/Lookuptable.cpp simulink/Lookuptable_data.cpp

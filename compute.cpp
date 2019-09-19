@@ -1,9 +1,9 @@
-#include "compute.h"
 #include <iostream>
 #include <vector>
-#include "Lookuptable.h"
-#include "rtwtypes.h"
+#include "simulink/Lookuptable.h"
+#include "simulink/rtwtypes.h"
 #include "var.h"
+#include "compute.h"
 using namespace std;
 
 

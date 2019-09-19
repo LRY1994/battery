@@ -1,9 +1,9 @@
-#include "exec.h"
 #include <cstdio>
+#include <fstream>
 #include "var.h"
 #include "tree.h"
 #include "spline.h"
-
+#include "exec.h"
 using namespace  std;
 
 Compute *ComputeObj=nullptr;

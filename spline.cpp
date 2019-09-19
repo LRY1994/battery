@@ -1,8 +1,8 @@
-#include "spline.h"
 #include<iostream>
 #include<cstdio>
 #include<cmath>
 #include "var.h"
+#include "spline.h"
 using namespace std;
 
 vector<double> Spline::interpolation(vector<Point> pointList,int option)

@@ -1,6 +1,6 @@
 #include <vector>
 #include "compute.h"
-#include<fstream>
+#include <fstream>
 using namespace std;
 
 #ifndef _VAR_H

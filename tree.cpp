@@ -2,7 +2,7 @@
 #include "struct.h"
 #include <stack>
 #include "var.h"
-#include<fstream>
+#include <fstream>
 using namespace std;
 
 
