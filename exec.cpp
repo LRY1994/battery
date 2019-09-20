@@ -66,7 +66,7 @@ vector<double> Exec::getMArray()
     double t;
     for (int i = 0; i < min_path.size(); i++)
     {
-        if(i > 0) t = ComputeObj->getTime(pointX[i-1],i);
+        if(i > 0) t = ComputeObj->getTime(pointX[i-1],i-1);
         else t = 0;
         point.push_back(Point(t,min_path[i]));
         pointX.push_back(t);
