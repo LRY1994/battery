@@ -4,6 +4,7 @@
 #include "tree.h"
 #include "spline.h"
 #include "exec.h"
+#include "current.h"
 using namespace  std;
 
 Compute *ComputeObj=nullptr;
@@ -12,15 +13,24 @@ vector<double> min_path;
 ofstream write;  
 
 
-Exec::Exec(int a_time_segment,double a_rootT,int a_first_layer_num)
-{
-    time_segment = a_time_segment;
-    layer = a_time_segment +1;
+Exec::Exec(double a_rootT,int a_first_layer_num,int a_other_layer_num)
+{  
     rootT = a_rootT;
     first_layer_num = a_first_layer_num;
+    other_layer_num = a_other_layer_num;
 
-    ComputeObj= new  Compute(time_segment);
-    write.open("log.txt");  //将OF与“study.txt”文件关联起来
+    //handle current data
+    Current *CurrentObj = new Current(); 
+    char *p=(char*)"current_data\\UDDS.txt";
+    vector<Point> data = CurrentObj->readData(p,0 ,30);
+    vector<Current_Area>  current_data = CurrentObj->processData(data);
+
+    layer = current_data.size();
+
+    //initilize Compute
+    ComputeObj= new  Compute(current_data);
+
+    write.open("log.txt",ios::out);  //将OF与“study.txt”文件关联起来
 }
 
 
@@ -34,11 +44,9 @@ Exec::Exec(int a_time_segment,double a_rootT,int a_first_layer_num)
 vector<double> Exec::getMArray()
 {
 
-    double I = ComputeObj->getI();
-
     //build the tree;
     BTree tree;
-    Tree batteryTree(tree,rootT,first_layer_num,layer,I);
+    Tree batteryTree(tree, rootT, first_layer_num, other_layer_num, layer);
     batteryTree.create();
 
     write<<"build the tree done.... "<<endl;

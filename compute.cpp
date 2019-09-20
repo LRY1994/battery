@@ -7,39 +7,30 @@
 using namespace std;
 
 
-Compute::Compute(int segment){
-    initRtObj();
-    setDt(segment);
+Compute::Compute(vector<Current_Area> current){
+    rtObj = new LookuptableModelClass(); 
+    rtObj->initialize();
+    current_data = current;
 }
 
 /***************************************private*********************************/
 
-
-void  Compute::initRtObj(){
-    rtObj = new LookuptableModelClass(); 
-    rtObj->initialize();
+// Input I algorithm
+double Compute:: getI(int layer){
+    return current_data[layer].current;
 }
 
-// adaptive dt algorithm（可选）
-void Compute:: setDt(int segment){
-    for(int i=0;i<segment;i++){
-        dt.push_back(10);
-    }
-}
-
-// Input I algorithm（还没完成）
-double Compute:: getI(){
-    return 10;
+double Compute:: getDt(int layer){
+    return current_data[layer].dt;
 }
 
 double Compute::getTime(double lastTime,int layer){
-    return lastTime + dt[layer-1];
+    return lastTime + getDt(layer);
 }
 
-//Qt(还没完成)
+//Qt
 double Compute:: getQt(double I,double Tnex){
     double Beta = I/37;
-    // rtObj->initialize();
     rtObj->rtU.Tnex = Tnex;
     rtObj->rtU.Beta = Beta;
     rtObj->step();
@@ -48,14 +39,13 @@ double Compute:: getQt(double I,double Tnex){
 }
 
 //R0
-double Compute::getR(double T,double I,double SOC,int layer){
-    // rtObj->initialize();
+double Compute::getR(double T,double SOC){
     rtObj->rtU.T = T;
     rtObj->rtU.SOC = SOC;
     rtObj->step();
     double R0 = rtObj->rtY.R0;
     write << "R0:"<<R0<<endl;
-    printf("R0:%lf\n\n",R0);
+    // printf("R0:%lf\n\n",R0);
     return R0;
 }
 
@@ -65,14 +55,14 @@ double Compute::getPcool(double T,double Tnex) {
 }
 
 //exo power
-double Compute::getPexo(double T,double I,double SOC,int layer) {
-    double R0 = getR(T,I,SOC,layer);
+double Compute::getPexo(double T,double I,double SOC) {
+    double R0 = getR(T,SOC);
     return I*I*R0;
 }
 
 //PTC power
-double Compute::getPptc(double T,double Tnex,double Pcool,double Pexo,int layer) {
-    double Pptc = (Tnex-T)*Ctotal/dt[layer-1]+Pcool-Pexo;
+double Compute::getPptc(double T,double Tnex,double Pcool,double Pexo,int dt) {
+    double Pptc = ( Tnex-T ) * Ctotal / dt + Pcool - Pexo;
         if (Pptc < 0){
             return 0;
         }
@@ -83,17 +73,17 @@ double Compute::getPptc(double T,double Tnex,double Pcool,double Pexo,int layer)
 }
 
 //delta temperature
-double Compute::getDeltaT(double Pptc,double Pcool,double Pexo,int layer) {
-    return (Pptc-Pcool+Pexo)*dt[layer-1]/Ctotal;
+double Compute::getDeltaT(double Pptc,double Pcool,double Pexo,int dt) {
+    return ( Pptc - Pcool + Pexo ) * dt / Ctotal;
 }
 
 //delta SOC
-double Compute:: getDeltaSoc(double parentT, double childT, double parentSOC,int parentLayer,double I){
+double Compute:: getDeltaSoc(double parentT, double childT, double parentSOC,int dt,double I){
     double Pcool = getPcool(parentT,childT);
-    double Pexo = getPexo(parentT,I,parentSOC,parentLayer);
-    double Pptc = getPptc(parentT,childT,Pcool,Pexo,parentLayer);
+    double Pexo = getPexo(parentT,I,parentSOC);
+    double Pptc = getPptc(parentT,childT,Pcool,Pexo,dt);
     double Qt = getQt(I,childT);
-    double dsoc = (I+Pptc/Uptc)*(dt[parentLayer-1]/3600)/Qt;
+    double dsoc = ( I + Pptc / Uptc ) * ( dt / 3600) / Qt;
     return  dsoc;
 }
 
@@ -101,21 +91,25 @@ double Compute:: getDeltaSoc(double parentT, double childT, double parentSOC,int
 
 /******************* public *************************/
 
-double Compute:: get_max_T(double parentT,int parentLayer,double parentSOC,double I)
+double Compute:: get_max_T(double parentT,double parentSOC,int parentLayer)
 {
     double Pptc = Pmax;
+    double I = getI(parentLayer);
+    int dt = getDt(parentLayer);
     double Pcool = getPcool(parentT,parentT);
-    double Pexo = getPexo(parentT,I,parentSOC,parentLayer);
-    return getDeltaT(Pptc,Pcool,Pexo,parentLayer) + parentT;
+    double Pexo = getPexo(parentT,I,parentSOC);
+    return getDeltaT(Pptc,Pcool,Pexo,dt) + parentT;
 
 }
 
-double Compute::get_min_T(double parentT,int parentLayer,double parentSOC,double I)
+double Compute::get_min_T(double parentT,double parentSOC,int parentLayer)
 {
     double Pptc = 0;
+    double I = getI(parentLayer);
+    int dt = getDt(parentLayer);
     double Pcool = getPcool(parentT,parentT);
-    double Pexo = getPexo(parentT,I,parentSOC,parentLayer);
-    return getDeltaT(Pptc,Pcool,Pexo,parentLayer) + parentT;
+    double Pexo = getPexo(parentT,I,parentSOC);
+    return getDeltaT(Pptc,Pcool,Pexo,dt) + parentT;
 }
 /**
 * define first layer temperature
@@ -124,17 +118,18 @@ double Compute::get_min_T(double parentT,int parentLayer,double parentSOC,double
 * parentT :the temperature of parent
 *
 */
-double Compute:: get_firstLayer_T(int i,int N,double parentT,double SOC,double I){
-    const int layer = 1;
-    double Tmin = get_min_T(parentT,layer,I,SOC);
-    double Tmax = get_max_T(parentT,layer,I,SOC);
+double Compute:: get_firstLayer_T(int i,int N,double parentT,double SOC){
+    const int layer = 0;
+    double I = getI(layer);
+    double Tmin = get_min_T(parentT,layer,SOC);
+    double Tmax = get_max_T(parentT,layer,SOC);
     double const M = 2*N;
     double childT = ( M - 2 * i + 1) * Tmin/ M  + (2 * i - 1) * Tmax/ M ;
 
-    printf("parentT:%lf\n",parentT); write << "parentT:"<<parentT<<endl;
-    printf("childTmin:%lf\n",Tmin);write << "childTmin:"<<Tmin<<endl;
-    printf("childTmax:%lf\n",Tmax);write << "childTmax:"<<Tmax<<endl;
-    printf("childT:%lf\n\n",childT);write << "childT:"<<childT<<endl;
+    // printf("parentT:%lf\n",parentT); write << "parentT:"<<parentT<<endl;
+    // printf("childTmin:%lf\n",Tmin);write << "childTmin:"<<Tmin<<endl;
+    // printf("childTmax:%lf\n",Tmax);write << "childTmax:"<<Tmax<<endl;
+    // printf("childT:%lf\n\n",childT);write << "childT:"<<childT<<endl;
 
     return childT;
 
@@ -144,19 +139,26 @@ double Compute:: get_firstLayer_T(int i,int N,double parentT,double SOC,double I
 * childT:child's temperature
 * layer: parent's layer,begin with 1
 */
-double Compute::cal_cost(double parentT,double childT,int parentLayer,double parentSOC,double I)
+double Compute::cal_cost(double parentT,double childT,double parentSOC,int parentLayer)
 {
+    int dt = getDt(parentLayer);
+    double I = getI(parentLayer);
     double Qt = getQt(I,childT);
     double Pcool = getPcool(parentT,childT);
-    double Pexo = getPexo(parentT,I, parentSOC,parentLayer);
-    double Pptc = getPptc(parentT,childT,Pcool,Pexo,parentLayer);
-    printf("Qt:%.4lf; Pcool:%.4lf; Pexo:%.4lf; Pptc:%.4lf; layer:%ld\n",Qt, Pcool, Pexo, Pptc,parentLayer);
-    write << "Qt:"<<Qt<<"Pcool:"<<Pcool<<"Pptc:"<<Pptc<< "layer:"<<parentLayer<<endl;
-    return (Pptc/Uptc+I) * (Q0/Qt) * (dt[parentLayer-1]/3600);
+    double Pexo = getPexo(parentT,I, parentSOC);
+    double Pptc = getPptc(parentT,childT,Pcool,Pexo,dt);
+    printf("Qt:%.4lf; Pcool:%.4lf; Pexo:%.4lf; Pptc:%.4lf; I:%lf;dt:%ld\n",Qt, Pcool, Pexo, Pptc,I,dt);
+    write << "Qt:"<<Qt<<",Pcool:"<<Pcool<<",Pptc:"<<Pptc<< ",I:"<<I<<",dt:"<<dt<<endl;
+    // return  (Pptc/Uptc+I) * (Q0/Qt) * (dt / 3600);
+     double a = (Pptc/Uptc+I) * Q0  * dt / Qt / 3600;
+     cout<<a<<endl<<endl;
+    return a;
 
 }
 
 
-double Compute::getSoc(double parentT, double childT, double parentSOC,int parentLayer,double I){
-    return parentSOC - getDeltaSoc( parentT,  childT,  parentSOC, parentLayer, I);
+double Compute::getSoc(double parentT, double childT, double parentSOC,int parentLayer){
+    int dt = getDt(parentLayer);
+    double I = getI(parentLayer);
+    return parentSOC - getDeltaSoc( parentT,  childT,  parentSOC, dt,I);
 }

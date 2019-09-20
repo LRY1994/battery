@@ -2,71 +2,72 @@
 #define COMPUTE
 
 #include <vector>
+#include "struct.h"
 #include "./simulink/Lookuptable.h"
 using namespace std;
 
 class Compute
 {
 private:
-     double Tenv = -10;
-     double E = 0;
-     double deltax = 0.01;
-     double lamda = 0.03;
-     double ha = 7.5;
-     double A = 0.54;
-     double Pmax = 500;
-     double Q0 = 37;
-     double Ctotal = 19501.272;
-     double SOC0 = 1;
-     double Uptc = 48;
-     vector<double> dt;
+     static constexpr  double Tenv = -10;
+     static constexpr  double E = 0;
+     static constexpr  double deltax = 0.01;
+     static constexpr  double lamda = 0.03;
+     static constexpr  double ha = 7.5;
+     static constexpr  double A = 0.54;
+     static constexpr  double Pmax = 500;
+     static constexpr  double Q0 = 37;
+     static constexpr  double Ctotal = 19501.272;
+     static constexpr  double SOC0 = 1;
+     static constexpr  double Uptc = 48;
+     vector<Current_Area> current_data;
      LookuptableModelClass *rtObj;
 
-     void setDt(int segment);
-     
-     void initRtObj();
 
-     //Qt(还没完成)
+     double  getDt(int layer);
+     double  getI(int layer);
+     
+
+     //Qt
      double getQt(double I,double Tnex);
 
-     //R0（还没完成）
-     double getR(double T,double I,double Pptc,int layer);
+     //R0
+     double getR(double T,double Pptc);
 
      //cooling power
      double getPcool(double T,double Tnex) ;
 
      //exo power
-     double getPexo(double T,double I,double Pptc,int layer) ;
+     double getPexo(double T,double I,double Pptc) ;
 
      //PTC power
-     double getPptc(double T,double Tnex,double Pcool,double Pexo,int layer);
+     double getPptc(double T,double Tnex,double Pcool,double Pexo,int dt);
 
      //delta temperature
-     double getDeltaT(double Pptc,double Pcool,double Pexo,int layer);
+     double getDeltaT(double Pptc,double Pcool,double Pexo,int dt);
 
      //delta SOC
-     double getDeltaSoc(double parentT, double childT, double parentSOC,int parentLayer,double I);
+     double getDeltaSoc(double parentT, double childT, double parentSOC,int dt,double I);
 
 public:
-    Compute(int segment);
+    Compute(vector<Current_Area>);
 
-    double getI();
-    double getTime(double lastTime,int layer);
+    double getTime(double lastTime,int parentLayer);
 
     //return the max temperature of this node
-    double get_max_T(double parentT,int parentLayer,double parentSOC,double I);
+    double get_max_T(double parentT,double parentSOC,int parentLayer);
 
     //return the min temperature of this node
-    double get_min_T(double parentT,int parentLayer,double parentSOC,double I);
+    double get_min_T(double parentT,double parentSOC,int parentLayer);
 
     //return temperature of the first layer
-    double get_firstLayer_T(int i,int N,double parentT,double parentSOC,double I);
+    double get_firstLayer_T(int i,int N,double parentT,double parentSOC);
 
     //return the remmant soc of this node
-    double getSoc(double parentT, double childT, double parentSOC,int parentLayer,double I);
+    double getSoc(double parentT, double childT, double parentSOC,int parentLayer);
 
     //return the cost of this transfer from it's parentNode
-    double cal_cost(double parentT,double childT,int parentLayer,double parentSOC,double I);
+    double cal_cost(double parentT,double childT,double parentSOC,int parentLayer);
 
 };
 

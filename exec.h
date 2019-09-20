@@ -13,13 +13,14 @@ public:
     vector<double> pointX;
     vector<double> pointY;
 
-    int time_segment;
-    int layer;
+    
     double rootT;
-    int first_layer_num;
+    int first_layer_num;//第一层分裂数
+    int other_layer_num;//其他层分裂数
+    int layer;
 
 
-    Exec(int time_segment,double initial_T,int first_layer_num);
+    Exec(double a_rootT, int a_first_layer_num, int a_other_layer_num);
 
     vector<double> getMArray();
     double getM(int index);

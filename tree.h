@@ -9,15 +9,15 @@ class Tree
 private:
     BTNode *&root;
     double rootT;// the temperature of root
-    int layer;   // how many layers of the tree
-    int firstLayerNum;
-    double I;
+    int first_layer_num;  
+    int other_layer_num;
+    int layer;
 public:
     Tree(BTNode *&root,
          double initial,
          int firstLayerNum,
-         int layer,
-         double I);
+         int other_layer_num,
+         int layer);
     void create();
     void depthFirstSearch();
 };

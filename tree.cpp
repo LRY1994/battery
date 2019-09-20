@@ -3,18 +3,19 @@
 #include <stack>
 #include "var.h"
 #include <fstream>
+#include <iostream>
 using namespace std;
 
 
 Tree::Tree(BTNode *&root,
             double a_rootT,
             int a_firstLayerNum,
-            int a_layer,
-            double a_I):root(root){
+            int a_other_layer_num,
+            int a_layer):root(root){
     rootT = a_rootT;
     layer = a_layer;
-    firstLayerNum = a_firstLayerNum;
-    I = a_I;
+    first_layer_num = a_firstLayerNum;
+    other_layer_num = a_other_layer_num;
 }
 
 void Tree::create(){
@@ -26,19 +27,19 @@ void Tree::create(){
         root = new BTNode();
         root->temperature = rootT;
         root->all_cost = 0;
-        root->layer = 1;
+        root->layer = 0;
         root->SOC = 1;
         root->path.push_back(root->temperature);
         layer_count ++;
 
-        //first layer，下标从1开始
+        //first layer，下标从0开始
         BTNode * tmp;
         int i=0;
-        while(i < firstLayerNum){
+        while(i < first_layer_num){
             i++;
             tmp = new BTNode();
-            tmp->temperature = ComputeObj->get_firstLayer_T(i,firstLayerNum,root->temperature,root->SOC,I);
-            tmp->SOC =  ComputeObj->getSoc(root->temperature,tmp->temperature,root->SOC,root->layer, I);
+            tmp->temperature = ComputeObj->get_firstLayer_T(i,first_layer_num,root->temperature,root->SOC);
+            tmp->SOC =  ComputeObj->getSoc(root->temperature,tmp->temperature,root->SOC,root->layer );
             tmp->all_cost = 0;
             tmp->layer = root->layer + 1 ;
             tmp->path.push_back(root->temperature);
@@ -55,15 +56,19 @@ void Tree::create(){
             for (int i = 0; i < list.size(); i++)
             {
                 BTNode *node = list[i];
-                double high = ComputeObj->get_max_T(node->temperature,node->layer,node->SOC,I) ;
-                double low =  ComputeObj->get_min_T(node->temperature,node->layer,node->SOC,I) ;
+                double high = ComputeObj->get_max_T(node->temperature,node->SOC, node->layer) ;
+                double low =  ComputeObj->get_min_T(node->temperature,node->SOC, node->layer) ;
                 double dist = high - low;
+                int child_num = other_layer_num;
+                while(child_num--){
+                    
+                }
                 //left node
                 tmp = new BTNode();
                 tmp->temperature = low + dist * 0.25;
                 tmp->all_cost = 0;
                 tmp->layer = node->layer + 1;
-                tmp->SOC =  ComputeObj->getSoc(node->temperature,tmp->temperature,node->SOC,node->layer, I);
+                tmp->SOC =  ComputeObj->getSoc(node->temperature,tmp->temperature,node->SOC,node->layer);
                 node->children.push_back(tmp);
                 tmplist.push_back(tmp);
 
@@ -72,7 +77,7 @@ void Tree::create(){
                 tmp->temperature = high - dist * 0.25;
                 tmp->all_cost = 0;
                 tmp->layer = node->layer + 1;
-                tmp->SOC =  ComputeObj->getSoc(node->temperature,tmp->temperature,node->SOC,node->layer, I);
+                tmp->SOC =  ComputeObj->getSoc(node->temperature,tmp->temperature,node->SOC,node->layer);
                 node->children.push_back(tmp);
                 tmplist.push_back(tmp);
             }
@@ -103,10 +108,10 @@ void Tree::depthFirstSearch(){
 
                 double parentT = node->temperature;
                 double childT = child->temperature;
-                double power = ComputeObj ->cal_cost(parentT, childT, node->layer ,node->SOC, I);
+                double power = ComputeObj ->cal_cost(parentT, childT ,node->SOC, node->layer);
                 child->all_cost = node->all_cost + power;
 
-                // printf("parentT:%lf;childT:%lf;layer:%ld;power:%lf\n",parentT,childT,node->layer, power);
+                // printf("parentT:%lf;childT:%lf;layer:%ld;power:%lf\n\n",parentT,childT,node->layer, power);
 
                 if (child->all_cost < min_cost)
                 { //pruning

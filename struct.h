@@ -22,4 +22,17 @@ struct Point
     Point(double a,double b){ x=a;y=b;}
 };
 
+struct Current_Area{
+    double current;
+    int from;
+    int to ;
+    int dt;
+    Current_Area(double a,int b,int c){ 
+        current = a;
+        from = b;
+        to = c;
+        dt = c-b + 1;
+    }
+};
+
 #endif // _STRUCT_H
