@@ -44,7 +44,7 @@ double Compute::getR(double T,double SOC){
     rtObj->rtU.SOC = SOC;
     rtObj->step();
     double R0 = rtObj->rtY.R0;
-    write << "R0:"<<R0<<endl;
+    // write << "R0:"<<R0<<endl;
     // printf("R0:%lf\n\n",R0);
     return R0;
 }

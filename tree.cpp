@@ -59,27 +59,24 @@ void Tree::create(){
                 double high = ComputeObj->get_max_T(node->temperature,node->SOC, node->layer) ;
                 double low =  ComputeObj->get_min_T(node->temperature,node->SOC, node->layer) ;
                 double dist = high - low;
-                int child_num = other_layer_num;
-                while(child_num--){
-                    
-                }
-                //left node
-                tmp = new BTNode();
-                tmp->temperature = low + dist * 0.25;
-                tmp->all_cost = 0;
-                tmp->layer = node->layer + 1;
-                tmp->SOC =  ComputeObj->getSoc(node->temperature,tmp->temperature,node->SOC,node->layer);
-                node->children.push_back(tmp);
-                tmplist.push_back(tmp);
+                int j = 1;
+                //create child nodes
+                while(j <= other_layer_num){
+                    tmp = new BTNode();
+                    tmp->all_cost = 0;
+                    tmp->layer = node->layer + 1;
+                    tmp->SOC =  ComputeObj->getSoc(node->temperature,tmp->temperature,node->SOC,node->layer);
 
-                //right node
-                tmp = new BTNode();
-                tmp->temperature = high - dist * 0.25;
-                tmp->all_cost = 0;
-                tmp->layer = node->layer + 1;
-                tmp->SOC =  ComputeObj->getSoc(node->temperature,tmp->temperature,node->SOC,node->layer);
-                node->children.push_back(tmp);
-                tmplist.push_back(tmp);
+                    if(j == 1 ){
+                        tmp->temperature = high;
+                    }else{
+                        tmp->temperature = high - (2*j-1)*dist / (2 * other_layer_num );
+                    }
+                    
+                    node->children.push_back(tmp);
+                    tmplist.push_back(tmp);
+                    j++;
+                }
             }
 
             list = tmplist;
