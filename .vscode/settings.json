@@ -1,0 +1,60 @@
+{
+    // "workbench.colorTheme": "One Dark Pro",
+    //"atomKeymap.promptV3Features": true,
+    "editor.multiCursorModifier": "ctrlCmd",
+    // "[cpp]": {
+    //     "editor.quickSuggestions": true
+    // },
+    // "[c]": {
+    //     "editor.quickSuggestions": true
+    // },
+    "files.associations": {
+        "*.json": "jsonc",
+        "*.cfg": "ini",
+        "*.fsh": "glsl",
+        "stack": "cpp",
+        "iostream": "cpp",
+        "ostream": "cpp",
+        "*.tcc": "cpp",
+        "cctype": "cpp",
+        "clocale": "cpp",
+        "cmath": "cpp",
+        "cstdint": "cpp",
+        "cstdio": "cpp",
+        "cstdlib": "cpp",
+        "cwchar": "cpp",
+        "cwctype": "cpp",
+        "exception": "cpp",
+        "initializer_list": "cpp",
+        "iosfwd": "cpp",
+        "istream": "cpp",
+        "limits": "cpp",
+        "new": "cpp",
+        "stdexcept": "cpp",
+        "streambuf": "cpp",
+        "system_error": "cpp",
+        "type_traits": "cpp",
+        "typeinfo": "cpp",
+        "utility": "cpp",
+        "iomanip": "cpp"
+    },
+    "editor.snippetSuggestions": "top",
+    "C_Cpp.clang_format_sortIncludes": true,
+    "editor.wordWrap": "on",
+    "editor.formatOnPaste": true,
+    "editor.formatOnType": true,
+    "editor.codeActionsOnSaveTimeout": 500,
+    "files.autoSave": "onFocusChange",
+    "files.autoSaveDelay": 500,
+    "editor.hover.delay": 0,
+    "files.autoGuessEncoding": true,
+    "editor.detectIndentation": false,
+    "files.encoding": "utf8",
+    "editor.formatOnSaveTimeout": 20,
+    "editor.fontFamily": "Consolas",
+    // "workbench.iconTheme": "vscode-icons",
+    "fileheader.configObj": {
+        "autoAdd": true, // 将该选项设置为true即可开启
+    },
+    "code-runner.runInTerminal": true
+}

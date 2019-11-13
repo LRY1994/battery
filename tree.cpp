@@ -6,31 +6,34 @@
 #include <iostream>
 using namespace std;
 
-
 Tree::Tree(BTNode *&root,
-            double a_rootT,
-            int a_firstLayerNum,
-            int a_other_layer_num,
-            int a_layer):root(root){
+           double a_rootT,
+           int a_firstLayerNum,
+           int a_other_layer_num,
+           int a_layer,
+           int a_root_current_index) : root(root)
+{
     rootT = a_rootT;
-    layer = a_layer;
+    height = a_layer;
     first_layer_num = a_firstLayerNum;
     other_layer_num = a_other_layer_num;
+    min_cost = 9999999;
+    min_path.clear();
+    root_current_index = a_root_current_index;
 }
 
 void Tree::create(){
-
         vector<BTNode *> list;
-        int layer_count = 0;
+        int height_count = 0;
 
         //root
         root = new BTNode();
         root->temperature = rootT;
         root->all_cost = 0;
-        root->layer = 0;
+        root->current_index = root_current_index;
         root->SOC = 1;
         root->path.push_back(root->temperature);
-        layer_count ++;
+        height_count++;
 
         //first layer，下标从0开始
         BTNode * tmp;
@@ -39,39 +42,36 @@ void Tree::create(){
             i++;
             tmp = new BTNode();
             tmp->temperature = ComputeObj->get_firstLayer_T(i,first_layer_num,root->temperature,root->SOC);
-            tmp->SOC =  ComputeObj->getSoc(root->temperature,tmp->temperature,root->SOC,root->layer );
+            tmp->SOC = ComputeObj->getSoc(root->temperature, tmp->temperature, root->SOC, root->current_index);
             tmp->all_cost = 0;
-            tmp->layer = root->layer + 1 ;
+            tmp->current_index = root->current_index + 1;
             tmp->path.push_back(root->temperature);
 
             root->children.push_back(tmp);
             list.push_back(tmp);
         }
-        layer_count ++;
+        height_count++;
 
         vector<BTNode *> tmplist;
-        while (layer_count  < layer)
+        while (height_count <= height)
         {
 
             for (int i = 0; i < list.size(); i++)
             {
                 BTNode *node = list[i];
-                double high = ComputeObj->get_max_T(node->temperature,node->SOC, node->layer) ;
-                double low =  ComputeObj->get_min_T(node->temperature,node->SOC, node->layer) ;
+                double high = ComputeObj->get_max_T(node->temperature, node->SOC, node->current_index);
+                double low = ComputeObj->get_min_T(node->temperature, node->SOC, node->current_index);
                 double dist = high - low;
                 int j = 1;
                 //create child nodes
                 while(j <= other_layer_num){
                     tmp = new BTNode();
                     tmp->all_cost = 0;
-                    tmp->layer = node->layer + 1;
-                    tmp->SOC =  ComputeObj->getSoc(node->temperature,tmp->temperature,node->SOC,node->layer);
+                    tmp->current_index = node->current_index + 1;
+                    tmp->SOC = ComputeObj->getSoc(node->temperature, tmp->temperature, node->SOC, node->current_index);
 
-                    if(j == 1 ){
-                        tmp->temperature = high;
-                    }else{
-                        tmp->temperature = high - (2*j-1)*dist / (2 * other_layer_num );
-                    }
+                    tmp->temperature = high - (2*j-1)*dist / (2 * other_layer_num );//j从1开始计算，温度从大到小排序
+                    
                     
                     node->children.push_back(tmp);
                     tmplist.push_back(tmp);
@@ -80,7 +80,7 @@ void Tree::create(){
             }
 
             list = tmplist;
-            layer_count ++;
+            height_count++;
             tmplist.clear();
         }
 }
@@ -105,10 +105,10 @@ void Tree::depthFirstSearch(){
 
                 double parentT = node->temperature;
                 double childT = child->temperature;
-                double power = ComputeObj ->cal_cost(parentT, childT ,node->SOC, node->layer);
+                double power = ComputeObj ->cal_cost(parentT, childT ,node->SOC, node->current_index);
                 child->all_cost = node->all_cost + power;
 
-                // printf("parentT:%lf;childT:%lf;layer:%ld;power:%lf\n\n",parentT,childT,node->layer, power);
+                // printf("parentT:%lf;childT:%lf;current_index:%ld;power:%lf\n\n", parentT, childT, node->current_index, power);
 
                 if (child->all_cost < min_cost)
                 { //pruning
@@ -129,3 +129,9 @@ void Tree::depthFirstSearch(){
         }
     }
 
+ double  Tree:: getMinCost(){
+     return min_cost;
+ }
+ vector<double> Tree :: getPath(){
+     return min_path;
+ }

@@ -1,3 +1,6 @@
+/*
+* 对照组，手动模式
+*/
 #include "current.h"
 #include "manual.h"
 #include "spline.h"

@@ -7,7 +7,7 @@ using namespace std;
 typedef struct BTNode
 {
     double temperature;
-    int layer;
+    int current_index; //电流区间，根节点到其子节点为第0个电流区间，current_index为0
     double all_cost;
     int SOC;
     vector<double> path;
@@ -23,15 +23,15 @@ struct Point
 };
 
 struct Current_Area{
-    double current;
-    int from;
-    int to ;
+    double current;//电流
+    int from;//时刻
+    int to ;//时刻
     int dt;
     Current_Area(double a,int b,int c){ 
         current = a;
         from = b;
         to = c;
-        dt = c-b + 1;
+        dt = c-b;
     }
 };
 

@@ -6,8 +6,8 @@ using namespace std;
 #ifndef _VAR_H
 #define _VAR_H
     extern Compute *ComputeObj;
-    extern double min_cost ;
-    extern vector<double> min_path;
-    extern ofstream write; 
+
+    extern ofstream write;
+    extern vector<Current_Area> current_data;
 #endif // _VAR_H
 
