@@ -48,7 +48,7 @@ void Exec::buildMultiTree()
     
 
    
-    int next_T = rootT;
+    double next_T = rootT;
 
     int size = current_data.size();
     printf("It amouts to %d current areas\n", size);
@@ -145,7 +145,7 @@ vector<int> Exec::getDepth()
     int from = 0;
     int j = 0; //j为degree中第几个元素
     const int limitation = 10000; //时间复杂度的限制,复杂度即节点个数
-    int complexity;
+    int complexity,pre_com;
     int n;
     while (j < degree.size())
     {
@@ -153,7 +153,7 @@ vector<int> Exec::getDepth()
         // cout << "n:" << n << "j:" << j << "f:" << from;
         if (j == from)
         { //初始化
-            int complexity = 1;
+             complexity = 1;
         }
         else
         {
@@ -166,7 +166,7 @@ vector<int> Exec::getDepth()
             }
             else
             {
-                int pre_com = complexity;
+                pre_com = complexity;
                 complexity = complexity + (complexity - pre_com) * degree[j];
                 if (complexity>limitation)
                 { //如果超过复杂度范围，则放弃该层
