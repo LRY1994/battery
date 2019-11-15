@@ -25,6 +25,7 @@ public:
     void buildOneTree(double T, int height, int current_index);
     void buildMultiTree();
     void makePoints();
+    vector<int> getDepth();//根据电流划分高度
     double getAllCost();
     // double getM(int index);
     double getX(int index);

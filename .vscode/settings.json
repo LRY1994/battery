@@ -56,5 +56,6 @@
     "fileheader.configObj": {
         "autoAdd": true, // 将该选项设置为true即可开启
     },
-    "code-runner.runInTerminal": true
+    "code-runner.runInTerminal": true,
+    "C_Cpp.errorSquiggles": "Enabled"
 }

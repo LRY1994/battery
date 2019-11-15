@@ -23,8 +23,9 @@ Exec::Exec(double a_rootT,int a_first_layer_num,int a_other_layer_num)
     //handle current data
     Current *CurrentObj = new Current();
     char *file=(char*)"current_data\\24hours.txt";
-    vector<Point> data = CurrentObj->readData(file, 0, 40000);
+    vector<Point> data = CurrentObj->readData(file, 0, 60000);
     current_data = CurrentObj->processData(data);
+
    
 
    //initilize Compute
@@ -46,19 +47,18 @@ void Exec::buildMultiTree()
     //build the tree;
     
 
-    int height = 10;//最大高度10
+   
     int next_T = rootT;
 
     int size = current_data.size();
     printf("It amouts to %d current areas\n", size);
+    vector<int> depth = getDepth();
     int j = 0;
-    for ( int i = 0; i <size; i += height)
+    for (int i = 0; i < depth.size(); i ++)
     {
-        
-        height = height < size - i ? height : size - i;
-        printf("\nthe %d tree's height is %d:\n", j ,height);
+        printf("\nthe %d tree's height is %d:\n", j, depth[i]);
         int root_current_index = i ==  0 ? 0 : i - 1;
-        buildOneTree(next_T, height, root_current_index);
+        buildOneTree(next_T, depth[i], root_current_index);
         next_T = all_min_path.back();
         j++;
     }
@@ -124,5 +124,64 @@ void Exec::buildOneTree(double T, int height,int current_index)
 double Exec:: getAllCost()
 {
     return all_min_cost;
+}
 
-};
+//树深度与节点度自动优化算法
+vector<int> Exec::getDepth()
+{
+    vector<int> result;
+    vector<int> degree;
+    //节点度的计算
+    cout << current_data.size();
+    for (int i = 0; i < current_data.size(); i++)
+    {
+        if(current_data[i].dt>300)
+            degree.push_back(4);
+        else
+            degree.push_back(2);
+    }
+    // printf("degree is", degree[2]);
+    //树深度的计算
+    int from = 0;
+    int j = 0; //j为degree中第几个元素
+    const int limitation = 10000; //时间复杂度的限制,复杂度即节点个数
+    int complexity;
+    int n;
+    while (j < degree.size())
+    {
+        n = j - from + 1; //n为样本个数，也就是深度
+        // cout << "n:" << n << "j:" << j << "f:" << from;
+        if (j == from)
+        { //初始化
+            int complexity = 1;
+        }
+        else
+        {
+            if (n > 12)
+            { //如果超过最大深度，则放弃该点
+                result.push_back(n-1);
+                j--;
+                from = j;
+                j--;
+            }
+            else
+            {
+                int pre_com = complexity;
+                complexity = complexity + (complexity - pre_com) * degree[j];
+                if (complexity>limitation)
+                { //如果超过复杂度范围，则放弃该层
+                    result.push_back(n-1);
+                    j--;
+                    from = j;
+                    j--;
+                }
+            }
+        }
+        cout <<"de:"<<degree[j]<<endl;
+        j++;
+        // cout << j;
+    }
+    // printf("depth is", result);
+    result.push_back(n);
+    return result;
+}

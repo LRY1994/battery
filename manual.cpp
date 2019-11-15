@@ -20,8 +20,8 @@ Manual::Manual(double a_fromT, int a_toT)
 
     //handle current data
     Current *CurrentObj = new Current();
-    char *p = (char *)"current_data\\NEDC.txt";
-    vector<Point> data = CurrentObj->readData(p, 0, 1370);
+    char *p = (char *)"current_data\\24hours.txt";
+    vector<Point> data = CurrentObj->readData(p, 0, 60000);
     vector<Current_Area> current_data = CurrentObj->processData(data);
 
     Mlayer = current_data.size();
