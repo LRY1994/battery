@@ -18,8 +18,8 @@ double M_TO_T = 30;//target temp
  char *DATA_FILE = (char*)"current_data\\UDDS.txt";
  int FILE_FROM_POS = 0;
  int FILE_TO_POS = 300;
- double INITIAL_T = 0;//初始温度；
- int FIRST_LAYER_SPLIT = 5;//第一层分裂数;
+ double FROM_T = 0;//初始温度；
+ int FIRST_SPLIT = 5;//第一层分裂数;
  int SPLIT = 4;//其它层分裂数
 
 
@@ -43,25 +43,24 @@ int main (){
                         M_FROM_T,
                         M_TO_T
                     ); 
-            double cost = M.getCost();
-            cout << "the cost of manual operation is " << cost << endl;
+            cout << "the cost of manual operation is " << M.getCost() << endl;
             printf("choose the mode again(1 for manual mode, 2 for intelligent mode):  ");
         }
         /**************** 智能 ***********************/
         else if (mode == 2)
         {
-            Exec e( DATA_FILE, 
+            Exec E( DATA_FILE, 
                     FILE_FROM_POS,  
                     FILE_TO_POS ,
-                    INITIAL_T,
-                    FIRST_LAYER_SPLIT,
+                    FROM_T,
+                    FIRST_SPLIT,
                     SPLIT
                 ); //初始温度；第一层分裂数;其它层分裂数
    
 
-            printf("\nall min cost is %.2lf:\n", e.getCost());
+            printf("\nall min cost is %.2lf:\n", E.getCost());
             printf("points are( time , temperature ):\n");
-            for (int i = 0; i < e.getPointSize(); i++) printf("( %.2lf  ,  %.2lf ) \n", e.getX(i), e.getY(i));
+            for (int i = 0; i < E.getPointSize(); i++) printf("( %.2lf  ,  %.2lf ) \n", E.getX(i), E.getY(i));
             printf("choose the mode again(1 for manual mode, 2 for intelligent mode):  ");
         }
 

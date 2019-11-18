@@ -16,16 +16,16 @@ using namespace std;
     extern  char *DATA_FILE ;
     extern  int FILE_FROM_POS ;
     extern  int FILE_TO_POS ;
-    extern  double INITIAL_T ;//初始温度；
-    extern  int FIRST_LAYER_SPLIT ;//第一层分裂数;
+    extern  double FROM_T ;//初始温度；
+    extern  int FIRST_SPLIT ;//第一层分裂数;
     extern  int SPLIT ;//其它层分裂数
 
 
 
     /*global variable*/
     extern Compute *g_ComputeObj;
-    extern ofstream write;
     extern vector<Current_Area> g_CurrentData;
+    extern ofstream write;
 
 #endif // _VAR_H
 
