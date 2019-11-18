@@ -6,13 +6,16 @@
 #include "spline.h"
 #include "exec.h"
 #include "current.h"
+
 using namespace std;
 
-Compute *ComputeObj=nullptr;
-vector<Current_Area> current_data;
-ofstream write;
 
-Exec::Exec(double a_rootT,int a_first_layer_num,int a_other_layer_num)
+Exec::Exec(char *file, 
+            int fromPos, 
+            int toPos,
+            double a_rootT,
+            int a_first_layer_num,
+            int a_other_layer_num )
 {  
     rootT = a_rootT;
     first_layer_num = a_first_layer_num;
@@ -22,14 +25,11 @@ Exec::Exec(double a_rootT,int a_first_layer_num,int a_other_layer_num)
     write.open("log.txt", ios::out); //将OF与“log.txt”文件关联起来
     //handle current data
     Current *CurrentObj = new Current();
-    char *file=(char*)"current_data\\ONEDAY.txt";
-    vector<Point> data = CurrentObj->readData(file, 30651, 31000);
-    current_data = CurrentObj->processData(data);
-
-   
+    vector<Point> data = CurrentObj->readData(file, fromPos, toPos);
+    g_CurrentData = CurrentObj->processData(data);
 
    //initilize Compute
-   ComputeObj = new Compute(current_data);
+    g_ComputeObj = new Compute(g_CurrentData);
 
 }
 
@@ -50,7 +50,7 @@ void Exec::buildMultiTree()
    
     double next_T = rootT;
 
-    int size = current_data.size();
+    int size = g_CurrentData.size();
     printf("It amouts to %d current areas\n", size);
     vector<int> depth = getDepth();
     int j = 0;
@@ -72,7 +72,7 @@ void Exec::makePoints()
     for (int i = 0; i < all_min_path.size(); i++)
     {
         if (i > 0)
-            t = ComputeObj->getTime(pointX[i - 1], i - 1);
+            t = g_ComputeObj->getTime(pointX[i - 1], i - 1);
         else
             t = 0;
         point.push_back(Point(t, all_min_path[i]));
@@ -132,10 +132,10 @@ vector<int> Exec::getDepth()
     vector<int> result;
     vector<int> degree;
     //节点度的计算
-    // cout << current_data.size();
-    for (int i = 0; i < current_data.size(); i++)
+    // cout << g_CurrentData.size();
+    for (int i = 0; i < g_CurrentData.size(); i++)
     {
-        if(current_data[i].dt>300)
+        if(g_CurrentData[i].dt>300)
             degree.push_back(4);
         else
             degree.push_back(3);

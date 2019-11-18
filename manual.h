@@ -12,7 +12,8 @@ public:
     double fromT;
     double toT;
 
-    Manual(double a_fromT, int a_toT);
+
+    Manual( char *file, int fromPos,   int toPos ,double a_fromT, double a_toT ); 
     double getCost();
 };
 

@@ -15,13 +15,13 @@ public:
     double all_min_cost ;
     vector<double> all_min_path;
 
-        double rootT;
+    double rootT;
     int first_layer_num;//第一层分裂数
     int other_layer_num;//其他层分裂数
     
 
 
-    Exec(double a_rootT, int a_first_layer_num, int a_other_layer_num);
+    Exec(char *file, int fromPos, int toPos,double a_rootT, int a_first_layer_num, int a_other_layer_num);
     void buildOneTree(double T, int height, int current_index);
     void buildMultiTree();
     void makePoints();

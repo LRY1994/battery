@@ -1,32 +1,31 @@
-0  ,  0  ,  30
-0  ,  30  ,  60
-0  ,  60  ,  90
-0  ,  90  ,  120
-0  ,  120  ,  150
-0  ,  150  ,  180
-0  ,  180  ,  210
-0  ,  210  ,  240
-0  ,  240  ,  270
-0  ,  270  ,  300
-0  ,  300  ,  330
-0  ,  330  ,  349
-childT:0.041316
+0  ,  0  ,  19
+19.6042  ,  19  ,  49
+15.8023  ,  49  ,  79
+22.6387  ,  79  ,  109
+-8.44258  ,  109  ,  139
+0  ,  139  ,  162
+27.0258  ,  162  ,  192
+71.2616  ,  192  ,  222
+52.09  ,  222  ,  252
+45.599  ,  252  ,  282
+16.94  ,  282  ,  300
+childT:0.0416869
 parentT:0
-childTmin:-0.0356021
-childTmax:0.733579
-childT:0.195152
+childTmin:-0.0352311
+childTmax:0.733949
+childT:0.195523
 parentT:0
-childTmin:-0.0356021
-childTmax:0.733579
-childT:0.348988
+childTmin:-0.0352311
+childTmax:0.733949
+childT:0.349359
 parentT:0
-childTmin:-0.0356021
-childTmax:0.733579
-childT:0.502824
+childTmin:-0.0352311
+childTmax:0.733949
+childT:0.503195
 parentT:0
-childTmin:-0.0356021
-childTmax:0.733579
-childT:0.65666
+childTmin:-0.0352311
+childTmax:0.733949
+childT:0.657031
 parentT:0
-childTmin:-0.0356021
-childTmax:0.733579
+childTmin:-0.0352311
+childTmax:0.733949

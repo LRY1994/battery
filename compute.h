@@ -19,7 +19,6 @@ private:
      static constexpr  double Ctotal = 19501.272;
      static constexpr  double SOC0 = 1;
      static constexpr  double Uptc = 48;
-    //  vector<Current_Area> current_data;
      LookuptableModelClass *rtObj;
 
  public:
@@ -27,10 +26,10 @@ private:
  
      //Dt
      double  getDt(int layer);
-
      //I
      double  getI(int layer);
-     
+
+     double getTime(double lastTime, int parentLayer);
 
      //Qt
      double getQt(double I,double Tnex);
@@ -52,10 +51,6 @@ private:
 
      //delta SOC
      double getDeltaSoc(double parentT, double childT, double parentSOC,int dt,double I);
-
-     
-
-     double getTime(double lastTime, int parentLayer);
 
      //return the max temperature of this node
      double get_max_T(double parentT, double parentSOC, int parentLayer);
