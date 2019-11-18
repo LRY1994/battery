@@ -22,8 +22,8 @@ Exec::Exec(double a_rootT,int a_first_layer_num,int a_other_layer_num)
     write.open("log.txt", ios::out); //将OF与“log.txt”文件关联起来
     //handle current data
     Current *CurrentObj = new Current();
-    char *file=(char*)"current_data\\ONEDAY.txt";
-    vector<Point> data = CurrentObj->readData(file, 30651, 31000);
+    char *file=(char*)"current_data\\24hours.txt";
+    vector<Point> data = CurrentObj->readData(file, 0, 86400);
     current_data = CurrentObj->processData(data);
 
    
