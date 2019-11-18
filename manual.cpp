@@ -13,15 +13,14 @@ using namespace std;
 Compute *MComputeObj = nullptr;
 int Mlayer;
 
-Manual::Manual(double a_fromT, int a_toT)
+Manual::Manual( char *file, int fromPos, int toPos ,double a_fromT, double a_toT )
 {
     fromT = a_fromT;
     toT = a_toT;  
 
     //handle current data
     Current *CurrentObj = new Current();
-    char *p = (char *)"current_data\\24hours.txt";
-    vector<Point> data = CurrentObj->readData(p, 0, 86400);
+    vector<Point> data = CurrentObj->readData( file, fromPos, toPos );
     vector<Current_Area> current_data = CurrentObj->processData(data);
 
     Mlayer = current_data.size();

@@ -10,18 +10,18 @@ using namespace std;
 Compute::Compute(vector<Current_Area> current){
     rtObj = new LookuptableModelClass(); 
     rtObj->initialize();
-    current_data = current;
+    g_CurrentData = current;
 }
 
 /***************************************private*********************************/
 
 // Input I algorithm
 double Compute:: getI(int layer){
-    return current_data[layer].current;
+    return g_CurrentData[layer].current;
 }
 
 double Compute:: getDt(int layer){
-    return current_data[layer].dt;
+    return g_CurrentData[layer].dt;
 }
 
 double Compute::getTime(double lastTime,int layer){

@@ -41,8 +41,8 @@ void Tree::create(){
         while(i < first_layer_num){
             i++;
             tmp = new BTNode();
-            tmp->temperature = ComputeObj->get_firstLayer_T(i,first_layer_num,root->temperature,root->SOC);
-            tmp->SOC = ComputeObj->getSoc(root->temperature, tmp->temperature, root->SOC, root->current_index);
+            tmp->temperature = g_ComputeObj->get_firstLayer_T(i,first_layer_num,root->temperature,root->SOC);
+            tmp->SOC = g_ComputeObj->getSoc(root->temperature, tmp->temperature, root->SOC, root->current_index);
             tmp->all_cost = 0;
             tmp->current_index = root->current_index + 1;
             tmp->path.push_back(root->temperature);
@@ -59,8 +59,8 @@ void Tree::create(){
             for (int i = 0; i < list.size(); i++)
             {
                 BTNode *node = list[i];
-                double high = ComputeObj->get_max_T(node->temperature, node->SOC, node->current_index);
-                double low = ComputeObj->get_min_T(node->temperature, node->SOC, node->current_index);
+                double high = g_ComputeObj->get_max_T(node->temperature, node->SOC, node->current_index);
+                double low = g_ComputeObj->get_min_T(node->temperature, node->SOC, node->current_index);
                 double dist = high - low;
                 int j = 1;
                 //create child nodes
@@ -68,7 +68,7 @@ void Tree::create(){
                     tmp = new BTNode();
                     tmp->all_cost = 0;
                     tmp->current_index = node->current_index + 1;
-                    tmp->SOC = ComputeObj->getSoc(node->temperature, tmp->temperature, node->SOC, node->current_index);
+                    tmp->SOC = g_ComputeObj->getSoc(node->temperature, tmp->temperature, node->SOC, node->current_index);
 
                     tmp->temperature = high - (2*j-1)*dist / (2 * other_layer_num );//j从1开始计算，温度从大到小排序
                     
@@ -105,7 +105,7 @@ void Tree::depthFirstSearch(){
 
                 double parentT = node->temperature;
                 double childT = child->temperature;
-                double power = ComputeObj ->cal_cost(parentT, childT ,node->SOC, node->current_index);
+                double power = g_ComputeObj ->cal_cost(parentT, childT ,node->SOC, node->current_index);
                 child->all_cost = node->all_cost + power;
 
                 // printf("parentT:%lf;childT:%lf;current_index:%ld;power:%lf\n\n", parentT, childT, node->current_index, power);
