@@ -21,8 +21,12 @@ Exec::Exec(char *file,
     first_layer_num = a_first_layer_num;
     other_layer_num = a_other_layer_num;
     all_min_cost = 0;
-
     write.open("log.txt", ios::out); //将OF与“log.txt”文件关联起来
+
+    build(file, fromPos, toPos);
+}
+
+void Exec::build(char *file,  int fromPos,  int toPos){
     //handle current data
     Current *CurrentObj = new Current();
     vector<Point> data = CurrentObj->readData(file, fromPos, toPos);
@@ -30,26 +34,15 @@ Exec::Exec(char *file,
 
    //initilize Compute
     g_ComputeObj = new Compute(g_CurrentData);
-
+    
+    buildMultiTree();
+    makePoints(); 
 }
 
-
-/**
- * @description 执行函数
- * @param {int} segment ，时间间隔数
- * @param {double} initialVal 初始温度
- * @param {int} firstLayerNum 第一层节点数
- * @returns {vector<double>} 返回m数组
- */
+//build the tree; 
 void Exec::buildMultiTree()
-{
-
-    //build the tree;
-    
-
-   
+{   
     double next_T = rootT;
-
     int size = g_CurrentData.size();
     printf("It amouts to %d current areas\n", size);
     vector<int> depth = getDepth();
@@ -61,29 +54,27 @@ void Exec::buildMultiTree()
         buildOneTree(next_T, depth[i], root_current_index);
         next_T = all_min_path.back();
         j++;
-    }
-   
+    } 
 
 }
 
 void Exec::makePoints()
 {
     double t;
-    for (int i = 0; i < all_min_path.size(); i++)
+    int size = all_min_path.size();
+    for (int i = 0; i < size; i++)
     {
         if (i > 0)
             t = g_ComputeObj->getTime(pointX[i - 1], i - 1);
         else
             t = 0;
-        point.push_back(Point(t, all_min_path[i]));
         pointX.push_back(t);
         pointY.push_back(all_min_path[i]);
     }
 }
-// double Exec:: getM(int index){
-//     return mArray[index];
-// }
-
+int Exec::getPointSize(){
+  return all_min_path.size();
+}
 double Exec::getX(int index){
  return pointX[index];
 }
@@ -121,7 +112,7 @@ void Exec::buildOneTree(double T, int height,int current_index)
     }
     cout << endl;
 }
-double Exec:: getAllCost()
+double Exec:: getCost()
 {
     return all_min_cost;
 }

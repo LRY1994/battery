@@ -57,12 +57,11 @@ int main (){
                     FIRST_LAYER_SPLIT,
                     SPLIT
                 ); //初始温度；第一层分裂数;其它层分裂数
-            e.buildMultiTree();
-            e.makePoints();     
+   
 
-            printf("\nall min cost is %.2lf:\n", e.getAllCost());
+            printf("\nall min cost is %.2lf:\n", e.getCost());
             printf("points are( time , temperature ):\n");
-            for (int i = 0; i < e.point.size(); i++) printf("( %.2lf  ,  %.2lf ) \n", e.getX(i), e.getY(i));
+            for (int i = 0; i < e.getPointSize(); i++) printf("( %.2lf  ,  %.2lf ) \n", e.getX(i), e.getY(i));
             printf("choose the mode again(1 for manual mode, 2 for intelligent mode):  ");
         }
 
