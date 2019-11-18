@@ -20,7 +20,7 @@ Manual::Manual(double a_fromT, int a_toT)
 
     //handle current data
     Current *CurrentObj = new Current();
-    char *p = (char *)"current_data\\24hours.txt";
+    char *p = (char *)"current_data\\ONEDAY.txt";
     vector<Point> data = CurrentObj->readData(p, 0, 60000);
     vector<Current_Area> current_data = CurrentObj->processData(data);
 
@@ -69,11 +69,11 @@ double Manual::getCost(){
          Qt = MComputeObj->getQt(I, T);
          Pcool = MComputeObj->getPcool(T, T);
          Pexo = MComputeObj->getPexo(T, I, SOC);
-        cost += MComputeObj->getCost(Pptc, Qt, I, dt);
+         cost += MComputeObj->getCost(Pptc, Qt, I, dt);
          DeltaT = MComputeObj->getDeltaT(Pptc, Pcool, Pexo, dt);
          parentT = T;
-        cout << "(" << time << "," << T << ")" << endl;
-        T += DeltaT;
+         cout << "(" << time << "," << T << ")" << endl;
+         T += DeltaT;
          DeltaSOC = MComputeObj->getDeltaSoc(parentT, T, SOC, dt, I);
          SOC = SOC - DeltaSOC;
     }

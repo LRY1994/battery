@@ -22,8 +22,8 @@ Exec::Exec(double a_rootT,int a_first_layer_num,int a_other_layer_num)
     write.open("log.txt", ios::out); //将OF与“log.txt”文件关联起来
     //handle current data
     Current *CurrentObj = new Current();
-    char *file=(char*)"current_data\\24hours.txt";
-    vector<Point> data = CurrentObj->readData(file, 0, 60000);
+    char *file=(char*)"current_data\\ONEDAY.txt";
+    vector<Point> data = CurrentObj->readData(file, 30651, 31000);
     current_data = CurrentObj->processData(data);
 
    
@@ -132,22 +132,22 @@ vector<int> Exec::getDepth()
     vector<int> result;
     vector<int> degree;
     //节点度的计算
-    cout << current_data.size();
+    // cout << current_data.size();
     for (int i = 0; i < current_data.size(); i++)
     {
         if(current_data[i].dt>300)
             degree.push_back(4);
         else
-            degree.push_back(2);
+            degree.push_back(3);
     }
     // printf("degree is", degree[2]);
     //树深度的计算
     int from = 0;
     int j = 0; //j为degree中第几个元素
-    const int limitation = 10000; //时间复杂度的限制,复杂度即节点个数
+    const int limitation = 20000; //时间复杂度的限制,复杂度即节点个数
     int complexity,pre_com;
     int n;
-    while (j < degree.size())
+    while (j < degree.size() + 1)
     {
         n = j - from + 1; //n为样本个数，也就是深度
         // cout << "n:" << n << "j:" << j << "f:" << from;
@@ -157,7 +157,7 @@ vector<int> Exec::getDepth()
         }
         else
         {
-            if (n > 12)
+            if (n > 13)
             { //如果超过最大深度，则放弃该点
                 result.push_back(n-1);
                 j--;
@@ -177,11 +177,13 @@ vector<int> Exec::getDepth()
                 }
             }
         }
-        cout <<"de:"<<degree[j]<<endl;
+        // cout <<"de:"<<degree[j]<<endl;
         j++;
         // cout << j;
     }
-    // printf("depth is", result);
     result.push_back(n);
+    for (int k = 0; k < result.size();k++){
+        cout << "the depth of " << k << "-th tree is " << result[k] << endl;
+    }
     return result;
 }

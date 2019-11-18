@@ -53,7 +53,7 @@ void Tree::create(){
         height_count++;
 
         vector<BTNode *> tmplist;
-        while (height_count <= height)
+        while (height_count + 1 <= height)
         {
 
             for (int i = 0; i < list.size(); i++)

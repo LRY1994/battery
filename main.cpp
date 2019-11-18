@@ -23,7 +23,8 @@ int main (){
 
             Manual M(0, 30); //fromT\toT
             double cost = M.getCost();
-            cout << "the cost of manual operation is " << cost;
+            cout << "the cost of manual operation is " << cost << endl;
+            printf("choose the mode again(1 for manual mode, 2 for intelligent mode):  ");
         }
 
         else if (mode == 2)
@@ -31,7 +32,7 @@ int main (){
 
             /**************** 智能 ***********************/
 
-            Exec e(0, 3, 3); //初始温度；第一层分裂数;其它层分裂数
+            Exec e(0, 5, 4); //初始温度；第一层分裂数;其它层分裂数
 
             e.buildMultiTree();
             e.makePoints();
@@ -48,6 +49,7 @@ int main (){
             {
                 printf("( %.2lf  ,  %.2lf ) \n", e.getX(i), e.getY(i));
             }
+            printf("choose the mode again(1 for manual mode, 2 for intelligent mode):  ");
         }
 
         else

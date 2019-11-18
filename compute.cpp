@@ -176,5 +176,13 @@ double Compute::getSoc(double parentT, double childT, double parentSOC, int pare
 {
     int dt = getDt(parentLayer);
     double I = getI(parentLayer);
-    return parentSOC - getDeltaSoc( parentT,  childT,  parentSOC, dt,I);
+    double curSOC = parentSOC - getDeltaSoc(parentT, childT, parentSOC, dt, I);
+    if (curSOC >= 0)
+    {
+        return curSOC;
+    }
+    else{
+        printf("No power!");
+        abort();
+    }
 }
