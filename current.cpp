@@ -37,7 +37,7 @@ vector<Point> Current::readData( const char* fileName, int from, int to){
         i++;
     }
     readstream.close();
-    for(int i=0;i<points.size();i++)cout<<points[i].x<<","<<points[i].y<<endl;
+    // for(int i=0;i<points.size();i++)cout<<points[i].x<<","<<points[i].y<<endl;
     return points;
 
 }

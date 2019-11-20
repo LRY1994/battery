@@ -39,7 +39,6 @@ void Tree::create(){
         BTNode * tmp;
         int i=0;
         while(i < first_layer_num){
-            i++;
             tmp = new BTNode();
             tmp->temperature = g_ComputeObj->get_firstLayer_T(i,first_layer_num,root->temperature,root->SOC);
             tmp->SOC = g_ComputeObj->getSoc(root->temperature, tmp->temperature, root->SOC, root->current_index);
@@ -49,36 +48,35 @@ void Tree::create(){
 
             root->children.push_back(tmp);
             list.push_back(tmp);
+            i++;
         }
         height_count++;
 
         vector<BTNode *> tmplist;
-        while (height_count + 1 <= height)
+        while (height_count + 1 <= height)//the number of the kids
         {
 
             for (int i = 0; i < list.size(); i++)
             {
                 BTNode *node = list[i];
                 double high = g_ComputeObj->get_max_T(node->temperature, node->SOC, node->current_index);
-                double low = g_ComputeObj->get_min_T(node->temperature, node->SOC, node->current_index);
+                double low =  g_ComputeObj->get_min_T(node->temperature, node->SOC, node->current_index);
                 double dist = high - low;
-                int j = 1;
+                double seg = dist / other_layer_num;
+
+                int j = 0;
                 //create child nodes
-                while(j <= other_layer_num){
+                while(j < other_layer_num){
                     tmp = new BTNode();
                     tmp->all_cost = 0;
                     tmp->current_index = node->current_index + 1;
+                    tmp->temperature = low + seg * j; //j从0开始计算，温度从小到大排序
                     tmp->SOC = g_ComputeObj->getSoc(node->temperature, tmp->temperature, node->SOC, node->current_index);
-
-                    tmp->temperature = high - (2*j-1)*dist / (2 * other_layer_num );//j从1开始计算，温度从大到小排序
-                    
-                    
                     node->children.push_back(tmp);
                     tmplist.push_back(tmp);
                     j++;
                 }
             }
-
             list = tmplist;
             height_count++;
             tmplist.clear();
@@ -105,11 +103,9 @@ void Tree::depthFirstSearch(){
 
                 double parentT = node->temperature;
                 double childT = child->temperature;
-                double power = g_ComputeObj ->cal_cost(parentT, childT ,node->SOC, node->current_index);
+                double power = g_ComputeObj->cal_cost(parentT, childT, node->SOC, node->current_index);
                 child->all_cost = node->all_cost + power;
-
                 // printf("parentT:%lf;childT:%lf;current_index:%ld;power:%lf\n\n", parentT, childT, node->current_index, power);
-
                 if (child->all_cost < min_cost)
                 { //pruning
                     child->path = node->path;
@@ -117,7 +113,6 @@ void Tree::depthFirstSearch(){
                     nodeStack.push(child);
                 }
             }
-
             if (node->children.size() == 0)
             { //child node
                 if (node->all_cost < min_cost)

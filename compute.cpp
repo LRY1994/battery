@@ -10,18 +10,19 @@ using namespace std;
 Compute::Compute(vector<Current_Area> current){
     rtObj = new LookuptableModelClass(); 
     rtObj->initialize();
-    g_CurrentData = current;
+    currentData = current;
 }
 
 /***************************************private*********************************/
 
 // Input I algorithm
-double Compute:: getI(int layer){
-    return g_CurrentData[layer].current;
+double Compute:: getI(int layer){ 
+    double I = currentData[layer].current;
+    return I;
 }
 
 double Compute:: getDt(int layer){
-    return g_CurrentData[layer].dt;
+    return currentData[layer].dt;
 }
 
 double Compute::getTime(double lastTime,int layer){
@@ -60,7 +61,7 @@ double Compute::getPcool(double T,double Tnex) {
 
 //exo power
 double Compute::getPexo(double T,double I,double SOC) {
-    double R0 = 0.08 * getR(T, SOC);
+    double R0 = getR(T, SOC);
     return I * I * R0;
 }
 
@@ -128,20 +129,18 @@ double Compute:: get_firstLayer_T(int i,int N,double parentT,double SOC){
     double I = getI(layer);
     double Tmin = get_min_T(parentT,layer,SOC);
     double Tmax = get_max_T(parentT,layer,SOC);
-    double const M = 2 * N;
-    double childT = ( M - 2 * i + 1) * Tmin / M  + (2 * i - 1) * Tmax / M ;//i从1开始计算，温度从小到大排序
-
+    double dist = Tmax - Tmin;
+    double seg = dist / N;
+    double childT = Tmin + i * seg; //i从1开始计算，温度从小到大排序
     // printf("parentT:%lf\n",parentT);    
     // printf("childTmin:%lf\n",Tmin);   
     // printf("childTmax:%lf\n",Tmax);
     // printf("childT:%lf\n\n", childT);
 
-    write << "childT:" << childT << endl;
-    write << "parentT:" << parentT << endl;
-    write << "childTmin:" << Tmin << endl;
-    write << "childTmax:" << Tmax << endl;
-
-
+    // write << "childT:" << childT << endl;
+    // write << "parentT:" << parentT << endl;
+    // write << "childTmin:" << Tmin << endl;
+    // write << "childTmax:" << Tmax << endl;
     return childT;
 
 }
@@ -159,13 +158,11 @@ double Compute::cal_cost(double parentT,double childT,double parentSOC,int paren
     double Pexo = getPexo(parentT,I, parentSOC);
     double Pptc = getPptc(parentT,childT,Pcool,Pexo,dt);
     // printf("Qt:%.4lf; Pcool:%.4lf; Pexo:%.4lf; Pptc:%.4lf; I:%lf;dt:%ld\n",Qt, Pcool, Pexo, Pptc,I,dt);
-    write << "Qt:"<<Qt<<",Pcool:"<<Pcool<<",Pptc:"<<Pptc<< ",I:"<<I<<",dt:"<<dt<<endl;
+    // write << "Qt:"<<Qt<<",Pcool:"<<Pcool<<",Pptc:"<<Pptc<< ",I:"<<I<<",dt:"<<dt<<endl;
     // return  (Pptc/Uptc+I) * (Q0/Qt) * (dt / 3600);
     double a = getCost(Pptc, Qt, I, dt);
     // cout << "cost:" << a << endl;
-
     return a;
-
 }
 
 double Compute::getCost(double Pptc,double Qt,double I, int dt ){

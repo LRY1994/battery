@@ -20,10 +20,11 @@ private:
      static constexpr  double SOC0 = 1;
      static constexpr  double Uptc = 48;
      LookuptableModelClass *rtObj;
+     vector<Current_Area> currentData;
 
  public:
-    Compute(vector<Current_Area>);
- 
+     Compute(vector<Current_Area>);
+
      //Dt
      double  getDt(int layer);
      //I

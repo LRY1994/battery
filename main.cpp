@@ -9,15 +9,15 @@ using namespace std;
 
 /*** input **/
 //mode==1
-char *M_DATA_FILE = (char*)"current_data\\UDDS.txt"; ;
+char *M_DATA_FILE = (char*)"current_data\\24hours.txt"; ;
 int M_FILE_FROM_POS =0;
-int M_FILE_TO_POS =300;
+int M_FILE_TO_POS =86400;
 double M_FROM_T = 0; //initial temp
-double M_TO_T = 30;//target temp
+double M_TO_T = -20;//target temp
 //mode==2 
- char *DATA_FILE = (char*)"current_data\\UDDS.txt";
+ char *DATA_FILE = (char*)"current_data\\24hours.txt";
  int FILE_FROM_POS = 0;
- int FILE_TO_POS = 300;
+ int FILE_TO_POS = 86400;
  double FROM_T = 0;//初始温度；
  int FIRST_SPLIT = 5;//第一层分裂数;
  int SPLIT = 4;//其它层分裂数
@@ -43,7 +43,7 @@ int main (){
                         M_FROM_T,
                         M_TO_T
                     ); 
-            cout << "the cost of manual operation is " << M.getCost() << endl;
+            cout << "the cost of manual operation is " << endl << M.getCost() << endl;
             printf("choose the mode again(1 for manual mode, 2 for intelligent mode):  ");
         }
         /**************** 智能 ***********************/
@@ -58,7 +58,8 @@ int main (){
                 ); //初始温度；第一层分裂数;其它层分裂数
    
 
-            printf("\nall min cost is %.2lf:\n", E.getCost());
+            printf("\nall min cost is %lf:\n", E.getCost());
+            write << endl << "all min cost is:" << E.getCost() << endl;
             printf("points are( time , temperature ):\n");
             for (int i = 0; i < E.getPointSize(); i++) printf("( %.2lf  ,  %.2lf ) \n", E.getX(i), E.getY(i));
             printf("choose the mode again(1 for manual mode, 2 for intelligent mode):  ");
