@@ -13,53 +13,44 @@ using namespace std;
 Exec::Exec(char *file, 
             int fromPos, 
             int toPos,
-            double a_rootT,
-            int a_first_layer_num,
-            int a_other_layer_num )
+            double a_rootT )
 {  
     rootT = a_rootT;
-    first_layer_num = a_first_layer_num;
-    other_layer_num = a_other_layer_num;
     all_min_cost = 0;
     write.open("log.txt", ios::out); //将OF与“log.txt”文件关联起来
-
     build(file, fromPos, toPos);
 }
 
 void Exec::build(char *file,  int fromPos,  int toPos){
     //handle current data
-    Current *CurrentObj = new Current();
-    vector<Point> data = CurrentObj->readData(file, fromPos, toPos);
-    vector<Current_Area> current_data  = CurrentObj->processData(data);
-
+    Current *CurrentObj = new Current(file, fromPos, toPos);
+    
     //initilize Compute
-    g_ComputeObj = new Compute(current_data);
+    vector<Current_Area> current_data =CurrentObj->getData();
     g_CurrentData = current_data;
+    g_ComputeObj = new Compute(current_data);
 
-    buildMultiTree();
+    buildMultiTree(CurrentObj->getDepth());
     makePoints(); 
 }
 
 //build the tree; 
-void Exec::buildMultiTree()
-{   
+void Exec::buildMultiTree(vector<int>depth)
+{ 
     double next_T = rootT;
-    int size = g_CurrentData.size();
-    printf("It amouts to %d current areas\n", size);
-    vector<int> depth = getDepth();
     int acce = 0;
 
     int j = 0;
     int root_current_index;
+   
     for (int i = 0; i < depth.size(); i++)
-    {
+    {        
         printf("\nthe %d tree's height is %d:\n", j, depth[i]);
         buildOneTree(next_T, depth[i], acce);
-        acce += (depth[i]-1);
+        acce += (depth[i] - 1);
         next_T = all_min_path.back();
         j++;
-    } 
-
+    }
 }
 
 void Exec::makePoints()
@@ -69,7 +60,7 @@ void Exec::makePoints()
     for (int i = 0; i < size; i++)
     {
         if (i > 0)
-            t = g_ComputeObj->getTime(pointX[i - 1], i - 1);
+            t = pointX[i-1] + g_ComputeObj->getDt( i - 1);
         else
             t = 0;
         pointX.push_back(t);
@@ -89,13 +80,16 @@ double Exec::getY(int index){
 
 void Exec::buildOneTree(double T, int height,int current_index)
 {
+  
     BTree tree;
-    Tree batteryTree(tree, T, first_layer_num, other_layer_num, height, current_index);
+    Tree batteryTree(tree, T,  height, current_index);
+   
     batteryTree.create();
-    
+
     //serach the tree;
     batteryTree.depthFirstSearch();
     double min_cost = batteryTree.getMinCost();
+
     all_min_cost += min_cost;
 
     write << "the min_cost of Ah is \n" << min_cost << endl;
@@ -121,71 +115,52 @@ double Exec:: getCost()
     return all_min_cost;
 }
 
-//树深度与节点度自动优化算法
-vector<int> Exec::getDepth()
+
+void Exec:: optimize(){
+    for (int i = 0; i + 2 < all_min_path.size();i++) {
+        three(i, i + 1, i + 2);
+    }
+
+
+}
+
+void three(double i,double j,double k){
+    double it = all_min_path(i);
+    double jt = all_min_path(j);
+    double kt = all_min_path(k);
+    vector<Point> pointList;
+    pointList.push_back(Point(i, it));
+    pointList.push_back(Point(k, kt));
+    pointList.push_back(Point(j, jt));
+    spline(pointList);
+
+    pointList.pop_back();
+    pointList.push_back(Point(j, jt + 0.5));
+    spline(pointList);
+
+    pointList.pop_back();
+    pointList.push_back(Point(j, jt - 0.5));
+    spline(pointList);
+}
+void spline(vector<Point> pointList)
 {
-    vector<int> result;
-    vector<int> degree;
-    //节点度的计算
-    // cout << g_CurrentData.size();
-    for (int i = 0; i < g_CurrentData.size(); i++)
+    Spline *s = new Spline();
+    vector<double> mVector = s->interpolation(pointList, 2);
+    int a[3], b[3], c[3], d[3];
+    for (int i = 0; i < 2; i++)
     {
-        if(g_CurrentData[i].dt>300)
-            degree.push_back(4);
-        else
-            degree.push_back(3);
-    }
-    // printf("degree is", degree[2]);
-    //树深度的计算
-    int from = 0;
-    int j = 0; //j为degree中第几个元素
-    const int limitation = 25000000; //时间复杂度的限制,复杂度即节点个数
-    int complexity, pre_com, prepre_com;
-    int n;
-    while (j < degree.size() + 1)
-    {
-        n = j - from + 1; //n为样本个数，也就是深度
-        // cout << "n:" << n << "j:" << j << "f:" << from;
-        if (j == from)
-        { //初始化
-             complexity = 1;
-        }
-        else if (j-1 == from)
+        a[i] = pointList[0].y;
+        double h = pointList[i + 1].x - pointList[i].x;
+        b[i] = (pointList[i + 1].y - pointList[i].y) / h - h * mVector[i] / 2 - h * (mVector[i + 1] - mVector[i]) / 6;
+        c[i] = mVector[i] / 2;
+        d[i] = (mVector[i + 1] - mVector[i]) / (6 * h);
+        double L = 0;
+        for (int j = 1; j < h; j++)
         {
-            pre_com = complexity;
-            complexity = pre_com + degree[j];
+            double hh = pointList[i].x + j;
+            double childy = a[i] + b[i] * (hh - 1) + c[i] * pow(hh - 1, 2) + d[i] * pow(hh - 1, 3);
+            double parenty = a[i] + b[i] * hh + c[i] * hh * hh + d[i] * hh * hh * hh;
+            L += g_ComputeObj->cal_cost(parenty, childy,);
         }
-        else
-        {
-            if (n > 15)
-            { //如果超过最大深度，则放弃该点
-                result.push_back(n-1);
-                j--;
-                from = j;
-                j--;
-            }
-            else
-            {
-                prepre_com = pre_com;
-                pre_com = complexity;
-                complexity = pre_com + (pre_com - prepre_com) * degree[j];
-                if (complexity>limitation)
-                { //如果超过复杂度范围，则放弃该层
-                    result.push_back(n-1);
-                    j--;
-                    from = j;
-                    j--;
-                }
-            }
-        }
-        // cout <<"de:"<<degree[j]<<endl;
-        j++;
-        // cout << j;
     }
-    result.push_back(n);
-    
-    for (int k = 0; k < result.size();k++){
-        cout << "the depth of " << k << "-th tree is " << result[k] << endl;
-    }
-    return result;
 }

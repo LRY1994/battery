@@ -8,70 +8,72 @@ using namespace std;
 
 Tree::Tree(BTNode *&root,
            double a_rootT,
-           int a_firstLayerNum,
-           int a_other_layer_num,
            int a_layer,
            int a_root_current_index) : root(root)
 {
     rootT = a_rootT;
     height = a_layer;
-    first_layer_num = a_firstLayerNum;
-    other_layer_num = a_other_layer_num;
     min_cost = 9999999;
     min_path.clear();
     root_current_index = a_root_current_index;
 }
 
 void Tree::create(){
+    
         vector<BTNode *> list;
         int height_count = 0;
-
+        
         //root
-        root = new BTNode();
-        root->temperature = rootT;
-        root->all_cost = 0;
-        root->current_index = root_current_index;
-        root->SOC = 1;
-        root->path.push_back(root->temperature);
+        root = new BTNode(
+            rootT,
+            root_current_index,
+            1
+        );
+        // root = new BTNode();
+        // root->temperature = rootT;
+        // root->all_cost = 0;
+        // root->current_index = root_current_index;
+        // root->SOC = 1;
+        
+        root->path.push_back(rootT);
         height_count++;
+        list.push_back(root);
+       
 
-        //first layer，下标从0开始
         BTNode * tmp;
-        int i=0;
-        while(i < first_layer_num){
-            tmp = new BTNode();
-            tmp->temperature = g_ComputeObj->get_firstLayer_T(i,first_layer_num,root->temperature,root->SOC);
-            tmp->SOC = g_ComputeObj->getSoc(root->temperature, tmp->temperature, root->SOC, root->current_index);
-            tmp->all_cost = 0;
-            tmp->current_index = root->current_index + 1;
-            tmp->path.push_back(root->temperature);
-
-            root->children.push_back(tmp);
-            list.push_back(tmp);
-            i++;
-        }
-        height_count++;
-
         vector<BTNode *> tmplist;
-        while (height_count + 1 <= height)//the number of the kids
+        while (height_count + 1 <= height)
         {
+           
 
             for (int i = 0; i < list.size(); i++)
             {
+                
                 BTNode *node = list[i];
                 double high = g_ComputeObj->get_max_T(node->temperature, node->SOC, node->current_index);
                 double low =  g_ComputeObj->get_min_T(node->temperature, node->SOC, node->current_index);
                 double dist = high - low;
-                double seg = dist / other_layer_num;
+                int degree = g_ComputeObj->getDegree(node->current_index);
+               
+
+                double seg = dist / degree;
 
                 int j = 0;
                 //create child nodes
-                while(j < other_layer_num){
+                while (j < degree)
+                {
                     tmp = new BTNode();
                     tmp->all_cost = 0;
                     tmp->current_index = node->current_index + 1;
                     tmp->temperature = low + seg * j; //j从0开始计算，温度从小到大排序
                     tmp->SOC = g_ComputeObj->getSoc(node->temperature, tmp->temperature, node->SOC, node->current_index);
+                   
+                    // tmp = new BTNode(
+                    //     low + seg * j,           //temperaturej从0开始计算，温度从小到大排序
+                    //     node->current_index + 1, //current_index
+                    //     g_ComputeObj->getSoc(node->temperature, tmp->temperature, node->SOC, node->current_index)
+                    // );
+                   
                     node->children.push_back(tmp);
                     tmplist.push_back(tmp);
                     j++;
@@ -105,7 +107,7 @@ void Tree::depthFirstSearch(){
                 double childT = child->temperature;
                 double power = g_ComputeObj->cal_cost(parentT, childT, node->SOC, node->current_index);
                 child->all_cost = node->all_cost + power;
-                // printf("parentT:%lf;childT:%lf;current_index:%ld;power:%lf\n\n", parentT, childT, node->current_index, power);
+                
                 if (child->all_cost < min_cost)
                 { //pruning
                     child->path = node->path;

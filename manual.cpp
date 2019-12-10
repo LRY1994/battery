@@ -19,9 +19,8 @@ Manual::Manual( char *file, int fromPos, int toPos ,double a_fromT, double a_toT
     toT = a_toT;  
 
     //handle current data
-    Current *CurrentObj = new Current();
-    vector<Point> data = CurrentObj->readData( file, fromPos, toPos );
-    vector<Current_Area> current_data = CurrentObj->processData(data);
+    Current *CurrentObj = new Current(file, fromPos, toPos);
+    vector<Current_Area> current_data = CurrentObj->getData();
 
     Mlayer = current_data.size();
 
@@ -62,11 +61,11 @@ double Manual::getCost(){
             Pptc = 0;
         }
 
-         time = MComputeObj->getTime(time, i);        
+         time = MComputeObj->getTime(i);        
 
          I = MComputeObj->getI(i);
          Qt = MComputeObj->getQt(I, T);
-         Pcool = MComputeObj->getPcool(T, T);
+         Pcool = MComputeObj->getPcool(T, T,i);
          Pexo = MComputeObj->getPexo(T, I, SOC);
          cost += MComputeObj->getCost(Pptc, Qt, I, dt);
          DeltaT = MComputeObj->getDeltaT(Pptc, Pcool, Pexo, dt);

@@ -9,10 +9,8 @@ class Tree
 private:
     BTNode *&root;
     double rootT;// the temperature of root
-    int first_layer_num;  
-    int other_layer_num;
-    int height;//树高度
-    int root_current_index;
+    int height;//the height of the tree
+    int root_current_index;//root node's corresponding current index
     double min_cost;        //result
     vector<double> min_path;//result
     
@@ -20,8 +18,6 @@ private:
 public:
     Tree(BTNode *&root,
          double initial,
-         int firstLayerNum,
-         int other_layer_num,
          int height ,
          int root_current_index);
     void create();

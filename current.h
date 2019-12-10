@@ -8,14 +8,23 @@ using namespace  std;
 
 class Current
 {
-public:  
-   //read data 
-    vector<Point> readData(const char* fileName,int from ,int to);
+    private:
+        vector<Current_Area> data;
+        vector<int> depth;
+        //read data
+        vector<Point> readData(const char *fileName, int from, int to);
+        //process data
+        void processData(vector<Point> data);
+        //degree of each area
+        void setDegree();
+        //tree height
+        void setDepth();
 
-    //process data
-    vector<Current_Area>  processData(vector<Point>data);
+    public:
+        Current(const char *fileName, int from, int to);
 
-
+        vector<int> getDepth();
+        vector<Current_Area> getData();
 };
 
 #endif // CURRENT_H

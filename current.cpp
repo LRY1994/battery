@@ -10,9 +10,16 @@
 #include <math.h>
 using namespace  std;
 
+Current::Current(const char *fileName, int from, int to)
+{
+    processData(readData(fileName, from, to));
+    setDegree();
+    setDepth();
+}
 
 //transform data from text to "points" vector
-vector<Point> Current::readData( const char* fileName, int from, int to){
+vector<Point> Current::readData(const char *fileName, int from, int to)
+{
     vector<Point> points;
     ifstream readstream;
     readstream.open(fileName,ios::in);
@@ -41,13 +48,12 @@ vector<Point> Current::readData( const char* fileName, int from, int to){
     return points;
 
 }
-
 //process data
-vector<Current_Area> Current:: processData(vector<Point>data){
+void Current:: processData(vector<Point>point){
     
     vector<Current_Area> result;
 
-    int size = data.size();
+    int size = point.size();
 
     double d = 0;//方差
     double S = 0;//标准差
@@ -62,9 +68,9 @@ vector<Current_Area> Current:: processData(vector<Point>data){
    
     int from = 0;
     int i = 0;//i为原始数据第几秒
-    // cout << data[30651].y << endl <<data[50].y << endl;
+    // cout << point[30651].y << endl <<point[50].y << endl;
     while(i < size){
-        double x = data[i].y;
+        double x = point[i].y;
         if(i == from){//初始化
             sum = x;
             sum2 = x * x;
@@ -109,7 +115,104 @@ vector<Current_Area> Current:: processData(vector<Point>data){
         cout << result[i].current << "  ,  " << result[i].from << "  ,  " << result[i].to << endl;
         write << result[i].current << "  ,  " << result[i].from << "  ,  " << result[i].to << endl;
      }
-    return result;
 
+     data = result;
+
+    //  return result;
 }
 
+
+//tree height
+
+//树深度与节点度自动优化算法
+void Current::setDegree()
+{
+
+    //节点度的计算
+    // cout << g_CurrentData.size();
+    for (int i = 0; i < data.size(); i++)
+    {
+        double val = data[i].dt * g_ComputeObj->Pmax / g_ComputeObj->Ctotal;
+        if (val <= 1)
+        {
+            
+            data[i].degree = 2;
+        }
+        else if (val > 1 && val <= 8)
+        {
+            
+            data[i].degree = 3;
+        }
+        else if (val > 8)
+        {
+            data[i].degree = 4;
+        }
+    }
+}
+
+void Current::setDepth()
+{
+   
+    vector<int> result;
+    //树深度的计算
+    int from = 0;
+    int j = 0;                       //j为degree中第几个元素
+    const int limitation = 80000000; //时间复杂度的限制,复杂度即节点个数
+    int complexity, pre_com, prepre_com;
+    int n;
+    while (j < data.size() + 1)
+    {
+        n = j - from + 1; //n为样本个数，也就是深度
+        // cout << "n:" << n << "j:" << j << "f:" << from;
+        if (j == from)
+        { //初始化
+            complexity = 1;
+        }
+        else if (j - 1 == from)
+        {
+            pre_com = complexity;
+            complexity = pre_com + data[j].degree;
+        }
+        else
+        {
+            if (n > 14)
+            { //如果超过最大深度，则放弃该点
+                result.push_back(n - 1);
+                j--;
+                from = j;
+                j--;
+            }
+            else
+            {
+                prepre_com = pre_com;
+                pre_com = complexity;
+                complexity = pre_com + (pre_com - prepre_com) * data[j].degree;
+                if (complexity > limitation)
+                { //如果超过复杂度范围，则放弃该层
+                    result.push_back(n - 1);
+                    j--;
+                    from = j;
+                    j--;
+                }
+            }
+        }
+        // cout <<"de:"<<degree[j]<<endl;
+        j++;
+        // cout << j;
+    }
+    result.push_back(n);
+
+    for (int k = 0; k < result.size(); k++)
+    {
+        cout << "the depth of " << k << "-th tree is " << result[k] << endl;
+    }
+    depth = result;
+}
+vector<Current_Area> Current::getData()
+{
+    return data;
+}
+vector<int> Current::getDepth()
+{
+    return depth;
+}

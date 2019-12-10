@@ -19,14 +19,13 @@ double M_TO_T = -20;//target temp
  int FILE_FROM_POS = 0;
  int FILE_TO_POS = 86400;
  double FROM_T = 0;//初始温度；
- int FIRST_SPLIT = 5;//第一层分裂数;
- int SPLIT = 4;//其它层分裂数
 
 
 /*** global variable  **/
 Compute *g_ComputeObj=nullptr;
 vector<Current_Area> g_CurrentData;
 ofstream write;
+
 
 int main (){
     // set the mode;
@@ -52,16 +51,14 @@ int main (){
             Exec E( DATA_FILE, 
                     FILE_FROM_POS,  
                     FILE_TO_POS ,
-                    FROM_T,
-                    FIRST_SPLIT,
-                    SPLIT
-                ); //初始温度；第一层分裂数;其它层分裂数
+                    FROM_T
+                ); 
    
 
             printf("\nall min cost is %lf:\n", E.getCost());
             write << endl << "all min cost is:" << E.getCost() << endl;
             printf("points are( time , temperature ):\n");
-            for (int i = 0; i < E.getPointSize(); i++) printf("( %.2lf  ,  %.2lf ) \n", E.getX(i), E.getY(i));
+            for (int i = 0; i < E.getPointSize(); i++) printf(" %.2lf  ,  %.2lf  \n", E.getX(i), E.getY(i));
             printf("choose the mode again(1 for manual mode, 2 for intelligent mode):  ");
         }
 
