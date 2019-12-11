@@ -46,16 +46,20 @@ vector<Point> Current::readData(const char *fileName, int from, int to)
     readstream.close();
     // for(int i=0;i<points.size();i++)cout<<points[i].x<<","<<points[i].y<<endl;
     return points;
-
 }
+
 //process data
 void Current:: processData(vector<Point>point){
     
     vector<Current_Area> result;
+    vector<Current_Area> Raw1;
 
     int size = point.size();
-
-    double d = 0;//方差
+    for (int i = 1; i < size;i++){
+        Raw1.push_back(Current_Area((point[i - 1].y + point[i].y) / 2, i - 1, i));
+    }
+    Raw = Raw1;
+    double d = 0; //方差
     double S = 0;//标准差
     double sum ;//和
     double sum2 ;//平方和
@@ -147,9 +151,10 @@ void Current::setDegree()
         {
             data[i].degree = 4;
         }
+        cout << val << endl;
+        // cout << data[i].degree << endl;
     }
 }
-
 void Current::setDepth()
 {
    
@@ -215,4 +220,8 @@ vector<Current_Area> Current::getData()
 vector<int> Current::getDepth()
 {
     return depth;
+}
+vector<Current_Area> Current::getpoint()
+{
+    return Raw;
 }

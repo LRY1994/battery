@@ -11,6 +11,7 @@ class Current
     private:
         vector<Current_Area> data;
         vector<int> depth;
+        vector<Current_Area> Raw;
         //read data
         vector<Point> readData(const char *fileName, int from, int to);
         //process data
@@ -25,6 +26,7 @@ class Current
 
         vector<int> getDepth();
         vector<Current_Area> getData();
+        vector<Current_Area> getpoint();
 };
 
 #endif // CURRENT_H

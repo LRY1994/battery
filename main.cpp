@@ -13,7 +13,7 @@ char *M_DATA_FILE = (char*)"current_data\\24hours.txt"; ;
 int M_FILE_FROM_POS =0;
 int M_FILE_TO_POS =86400;
 double M_FROM_T = 0; //initial temp
-double M_TO_T = -20;//target temp
+double M_TO_T = 0;//target temp
 //mode==2 
  char *DATA_FILE = (char*)"current_data\\24hours.txt";
  int FILE_FROM_POS = 0;
