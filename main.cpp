@@ -1,9 +1,10 @@
+#include "optimize.h"
 #include "compute.h"
 #include "exec.h"
 #include "manual.h"
+#include "var.h"
 #include <cstdio>
 #include <iostream>
-#include "var.h"
 #include <stdio.h>
 using namespace std;
 
@@ -60,6 +61,11 @@ int main (){
             printf("points are( time , temperature ):\n");
             for (int i = 0; i < E.getPointSize(); i++) printf(" %.2lf  ,  %.2lf  \n", E.getX(i), E.getY(i));
             printf("choose the mode again(1 for manual mode, 2 for intelligent mode):  ");
+
+            //optimize
+            Optimize OPT( E.pointX, E.pointY);
+            printf("\nafter optimize min cost is %lf:\n", OPT.getCost());
+      
         }
 
         else
@@ -70,4 +76,4 @@ int main (){
     getchar();
     return 0;
 };
-// g++  main.cpp exec.cpp tree.cpp compute.cpp spline.cpp simulink/Lookuptable.cpp simulink/Lookuptable_data.cpp current.cpp manual.cpp 
+// g++  main.cpp exec.cpp tree.cpp compute.cpp spline.cpp simulink/Lookuptable.cpp simulink/Lookuptable_data.cpp current.cpp manual.cpp optimize.cpp

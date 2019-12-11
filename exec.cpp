@@ -68,7 +68,7 @@ void Exec::makePoints()
     }
 }
 int Exec::getPointSize(){
-  return all_min_path.size();
+    return pointY.size();
 }
 double Exec::getX(int index){
  return pointX[index];
@@ -115,50 +115,3 @@ double Exec:: getCost()
     return all_min_cost;
 }
 
-
-// void Exec:: optimize(){
-//     for (int i = 0; i + 2 < all_min_path.size();i++) {
-//         three(i, i + 1, i + 2);
-//     }
-// }
-
-// void three(double i,double j,double k){
-//     double it = all_min_path(i);
-//     double jt = all_min_path(j);
-//     double kt = all_min_path(k);
-//     vector<Point> pointList;
-//     pointList.push_back(Point(i, it));
-//     pointList.push_back(Point(k, kt));
-//     pointList.push_back(Point(j, jt));
-//     spline(pointList);
-
-//     pointList.pop_back();
-//     pointList.push_back(Point(j, jt + 0.5));
-//     spline(pointList);
-
-//     pointList.pop_back();
-//     pointList.push_back(Point(j, jt - 0.5));
-//     spline(pointList);
-// }
-// void spline(vector<Point> pointList)
-// {
-//     Spline *s = new Spline();
-//     vector<double> mVector = s->interpolation(pointList, 2);
-//     int a[3], b[3], c[3], d[3];
-//     for (int i = 0; i < 2; i++)
-//     {
-//         a[i] = pointList[0].y;
-//         double h = pointList[i + 1].x - pointList[i].x;
-//         b[i] = (pointList[i + 1].y - pointList[i].y) / h - h * mVector[i] / 2 - h * (mVector[i + 1] - mVector[i]) / 6;
-//         c[i] = mVector[i] / 2;
-//         d[i] = (mVector[i + 1] - mVector[i]) / (6 * h);
-//         double L = 0;
-//         for (int j = 1; j < h; j++)
-//         {
-//             double hh = pointList[i].x + j;
-//             double childy = a[i] + b[i] * (hh - 1) + c[i] * pow(hh - 1, 2) + d[i] * pow(hh - 1, 3);
-//             double parenty = a[i] + b[i] * hh + c[i] * hh * hh + d[i] * hh * hh * hh;
-//             L += g_ComputeObj->cal_cost(parenty, childy,);
-//         }
-//     }
-// }
