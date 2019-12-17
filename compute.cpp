@@ -29,6 +29,7 @@ double Compute:: getDt(int layer){
 double Compute:: getDegree(int layer){
     return currentData[layer].degree;
 }
+
 double Compute::getTime(int layer){
     double result = 0;
     for (int i = 0; i <= layer;i++){
@@ -56,7 +57,7 @@ double Compute::getR(double T,double SOC){
     rtObj->rtU.T = T;
     rtObj->rtU.SOC = SOC;
     rtObj->step();
-    double R0 = 0.001 * rtObj->rtY.R0;
+    double R0 = 12 * 0.001 * rtObj->rtY.R0;
     return R0;
 }
 
@@ -263,15 +264,54 @@ double Compute::cal_cost(double parentT,double childT,double parentSOC,int paren
     double Ah_cost = getCost(Pptc, Qt, I, dt);
     double Cyc_cost;
     double Cal_cost;
+    double fenmu = R_gas * (abs(25 - parentT) + 248.15);
+    double fenzi = (-Eacyc + alpha * abs(I + Pptc/Uptc) / 37);
     if (Ah_cost >= 0)
     {
-        Cyc_cost = Bcyc * exp((-Eacyc + alpha * I / 37) / R_gas / (abs(25 - parentT) + 248.15)) * pow(Ah_cost, Zcyc);
-        Cal_cost = Bcal * exp(-Eacal / R_gas / (abs(25 - parentT) + 248.15)) * pow(dt, Zcal);
+        Cyc_cost = Bcyc * exp(fenzi / fenmu) * pow(Ah_cost, Zcyc);
+        Cal_cost = Bcal * exp(-Eacal / fenmu) * pow(dt, Zcal);
     }
     else
     {
-        Cyc_cost = Bcyc * exp((-Eacyc + alpha * I / 37) / R_gas / (abs(25 - parentT) + 248.15));
-        Cal_cost = Bcal * exp(-Eacal / R_gas / (abs(25 - parentT) + 248.15)) * pow(dt, Zcal);
+        Cyc_cost = Bcyc * exp(fenzi / fenmu);
+        Cal_cost = Bcal * exp(-Eacal / fenmu) * pow(dt, Zcal);
+    }
+    double all_cost;
+    if (abs(I) > 3)
+    {
+        all_cost = money_perAh * Ah_cost + money_perSOH * Cyc_cost;
+        // cout << "Ah_cost: " << Ah_cost << "Cyc_cost: " << Cyc_cost << endl;
+    }
+    else
+    {
+        all_cost = money_perAh * Ah_cost + money_perSOH * Cal_cost;
+        // cout << "Ah_cost: " << Ah_cost << "Cyc_cost: " << Cal_cost << endl;
+    }
+    return all_cost;
+}
+
+double Compute::cal_opti_cost(double parentT, double childT, double parentSOC, int parentLayer)
+{
+    int dt = 1;
+    double I = getI(parentLayer);
+    double Qt = getQt(I, childT);
+    double Pcool = getPcool(parentT, childT, parentLayer);
+    double Pexo = getPexo(parentT, I, parentSOC);
+    double Pptc = getPptc(parentT, childT, Pcool, Pexo, dt);
+    double Ah_cost = getCost(Pptc, Qt, I, dt);
+    double Cyc_cost;
+    double Cal_cost;
+    double fenmu = R_gas * (abs(25 - parentT) + 248.15);
+    double fenzi = (-Eacyc + alpha * abs(I + Pptc / Uptc) / 37);
+    if (Ah_cost >= 0)
+    {
+        Cyc_cost = Bcyc * exp(fenzi / fenmu) * pow(Ah_cost, Zcyc);
+        Cal_cost = Bcal * exp(-Eacal / fenmu) * pow(dt, Zcal);
+    }
+    else
+    {
+        Cyc_cost = Bcyc * exp(fenzi / fenmu);
+        Cal_cost = Bcal * exp(-Eacal /fenmu) * pow(dt, Zcal);
     }
     double all_cost;
     if (abs(I) > 3)
@@ -285,29 +325,59 @@ double Compute::cal_cost(double parentT,double childT,double parentSOC,int paren
     return all_cost;
 }
 
-double Compute::getCost(double Pptc,double Qt,double I, int dt ){
-    if(Pptc > 0){
-        return ((Pptc + Ppump) / Uptc + I) * Q0 * dt / Qt / 3600;
-    }
-    else
+double Compute::getCost(double Pptc, double Qt, double I, int dt)
     {
-        return I * Q0 * dt / Qt / 3600;
+        if (Pptc > 0)
+        {
+            return ((Pptc + Ppump) / Uptc + I) * Q0 * dt / Qt / 3600;
+        }
+        else
+        {
+            return I * Q0 * dt / Qt / 3600;
+        }
     }
-    
-    
-}
 
 double Compute::getSoc(double parentT, double childT, double parentSOC, int parentLayer)
-{
-    // int dt = getDt(parentLayer);
-    double I = getI(parentLayer);
-    double curSOC = parentSOC - getDeltaSoc(parentT, childT, parentSOC, parentLayer, I);
-    if (curSOC >= 0)
     {
-        return curSOC;
+        // int dt = getDt(parentLayer);
+        double I = getI(parentLayer);
+        double curSOC = parentSOC - getDeltaSoc(parentT, childT, parentSOC, parentLayer, I);
+        if (curSOC >= 0)
+        {
+            return curSOC;
+        }
+        else
+        {
+            printf("No power!");
+            abort();
+        }
     }
-    else{
-        printf("No power!");
-        abort();
+
+double Compute::get_opti_Soc(double parentT, double childT, double parentSOC, int parentLayer)
+    {
+        double I = getI(parentLayer);
+        int dt = 1;
+        double Pcool = getPcool(parentT, childT, parentLayer);
+        double Pexo = getPexo(parentT, I, parentSOC);
+        double Pptc = getPptc(parentT, childT, Pcool, Pexo, dt);
+        double Qt = getQt(I, childT);
+        double dsoc = (I + Pptc / Uptc)  / (3600* Qt);
+        // write << "i:" << I << ";Pptc:" << Pptc << ";Uptc:" << Uptc << ";Qt" << Qt << ";Pcool:" << Pcool << ";Pexo:" << Pcool << "parentT:" << parentT << "childT:" << childT << "dsoc:" << dsoc << endl;
+        // cout << "Pptc:" << Pptc<<endl;
+        // if (dsoc > 0)
+        // {
+        //     cout << dsoc << endl;
+        // }
+        
+        double curSOC = parentSOC - dsoc;
+        // write << dsoc << endl;
+        if (curSOC >= 0)
+        {
+            return curSOC;
+        }
+        else
+        {
+            printf("No power!");
+            abort();
+        }
     }
-}

@@ -92,8 +92,8 @@ void Exec::buildOneTree(double T, int height,int current_index)
 
     all_min_cost += min_cost;
 
-    write << "the min_cost of Ah is \n" << min_cost << endl;
-    printf("the min_cost of Ah is %lf\n", min_cost);
+    // write << "the min_cost of Money is \n" << min_cost << endl;
+    printf("the min_cost of Money is %lf\n", min_cost);
 
     vector<double> min_path = batteryTree.getPath();
     if(all_min_path.size()==0){
@@ -106,7 +106,7 @@ void Exec::buildOneTree(double T, int height,int current_index)
     printf("the temperature of min_cost path is:\n");
     for (int j = 0; j < min_path.size(); j++){
         printf("%.2lf,", min_path[j]);
-        write << min_path[j] << ",";
+        // write << min_path[j] << ",";
     }
     cout << endl;
 }

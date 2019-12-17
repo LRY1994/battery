@@ -10,11 +10,11 @@ using namespace std;
 
 /*** input **/
 //mode==1
-char *M_DATA_FILE = (char*)"current_data\\24hours.txt"; ;
+char *M_DATA_FILE = (char*)"current_data\\24hours.txt";
 int M_FILE_FROM_POS =0;
 int M_FILE_TO_POS =86400;
 double M_FROM_T = 0; //initial temp
-double M_TO_T = 0;//target temp
+double M_TO_T = -5;//target temp
 //mode==2 
  char *DATA_FILE = (char*)"current_data\\24hours.txt";
  int FILE_FROM_POS = 0;
@@ -42,8 +42,9 @@ int main (){
                         M_FILE_TO_POS ,
                         M_FROM_T,
                         M_TO_T
-                    ); 
-            cout << "the cost of manual operation is " << endl << M.getCost() << endl;
+                    );
+            cout << "the cost of manual operation is " << endl
+                 << M.getCost() << endl;
             printf("choose the mode again(1 for manual mode, 2 for intelligent mode):  ");
         }
         /**************** 智能 ***********************/
@@ -57,15 +58,14 @@ int main (){
    
 
             printf("\nall min cost is %lf:\n", E.getCost());
-            write << endl << "all min cost is:" << E.getCost() << endl;
+            // write << endl << "all min cost is:" << E.getCost() << endl;
             printf("points are( time , temperature ):\n");
             for (int i = 0; i < E.getPointSize(); i++) printf(" %.2lf  ,  %.2lf  \n", E.getX(i), E.getY(i));
-            printf("choose the mode again(1 for manual mode, 2 for intelligent mode):  ");
 
             //optimize
             Optimize OPT( E.pointX, E.pointY);
             printf("\nafter optimize min cost is %lf:\n", OPT.getCost());
-      
+            printf("choose the mode again(1 for manual mode, 2 for intelligent mode):  ");
         }
 
         else

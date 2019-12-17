@@ -19,15 +19,15 @@ private:
     static constexpr double Q0 = 37;
     static constexpr double Uptc = 48;
     static constexpr double Ppump = 36;
-    static constexpr double alpha = 243.33;
-    static constexpr double Bcyc = 0.1689;
+    static constexpr double alpha = 1243.33;
+    static constexpr double Bcyc = 0.0039;
     static constexpr double Bcal = 56128;
     static constexpr double Eacyc = 16361;
     static constexpr double Eacal = 62862;
     static constexpr double Zcyc = 0.5644; //ok
     static constexpr double Zcal = 0.4973;
-    static constexpr double money_perAh = 0.1;   //ok
-    static constexpr double money_perSOH = 9000; //ok
+    static constexpr double money_perAh = 0.0864;   //ok
+    static constexpr double money_perSOH = 15096; //ok
     static constexpr double R_gas = 8.314;
     LookuptableModelClass *rtObj;
     vector<Current_Area> currentData;
@@ -82,8 +82,13 @@ public:
     //return the cost of this transfer from it's parentNode
     double cal_cost(double parentT, double childT, double parentSOC, int parentLayer);
 
+    //return the cost of this transfer from it's parentNode
+    double cal_opti_cost(double parentT, double childT, double parentSOC, int parentLayer);
+
     //return the cost of manual operation
     double getCost(double Pptc, double Qt, double I, int dt);
+
+    double get_opti_Soc(double parentT, double childT, double parentSOC, int parentLayer);
 
     double getTenv(int parentLayer);
     };

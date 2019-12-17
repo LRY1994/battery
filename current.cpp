@@ -117,7 +117,7 @@ void Current:: processData(vector<Point>point){
     for (int i = 0; i < result.size(); i++)
     {
         cout << result[i].current << "  ,  " << result[i].from << "  ,  " << result[i].to << endl;
-        write << result[i].current << "  ,  " << result[i].from << "  ,  " << result[i].to << endl;
+        // write << result[i].current << "  ,  " << result[i].from << "  ,  " << result[i].to << endl;
      }
 
      data = result;
@@ -151,7 +151,7 @@ void Current::setDegree()
         {
             data[i].degree = 4;
         }
-        cout << val << endl;
+        // cout << val << endl;
         // cout << data[i].degree << endl;
     }
 }
@@ -194,6 +194,7 @@ void Current::setDepth()
                 complexity = pre_com + (pre_com - prepre_com) * data[j].degree;
                 if (complexity > limitation)
                 { //如果超过复杂度范围，则放弃该层
+                    // cout << "complx:" << complexity;
                     result.push_back(n - 1);
                     j--;
                     from = j;
